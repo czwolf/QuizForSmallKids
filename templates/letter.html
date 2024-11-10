@@ -1,0 +1,88 @@
+{% extends "index.html" %}
+
+{% block title %}
+Kvíz písmena
+{% endblock %}
+
+{% block content %}
+
+<div class="text-center">
+    <h1>Kvíz písmena</h1>
+    {% if request.args.get("run") == "False" %}
+    <p>Řekni jaké písmeno vidíš na obrázku.</p>
+    <p>Rodiče volbu zkontrolují.</p>
+    {% endif %}
+    {% if request.args.get("end") == "False" %}
+    {% if letter %}
+    <br>
+    <h1 style="font-size:72px">{{ letter }}</h1>
+    <h1 style="font-size:72px">{{ letter_lower }}</h1>
+    <br>
+    {%endif%}
+
+    {%if request.args.get("run") == "True" %}
+    <br>
+    <a href="{{ url_for('letters', run=False, delFile = True, end = False) }}" class="btn bg-primary text-white">Spustit kvíz</a>
+    {% endif %}
+
+    {%if request.args.get("run") == "False" %}
+    <a href="{{ url_for('letters', run=False, answer='Correct', delFile = False, end = False) }}" class="btn btn-success text-white">Správně</a>
+    <a href="{{ url_for('letters', run=False, answer='Fail',delFile = False, end = False) }}" class="btn btn-danger text-white">Špatně</a>
+    <a href="{{ url_for('letters', run=False, delFile = False, end = True) }}" class="btn btn-warning text-white">Ukončit kvíz</a>
+    {% endif %}
+    {% endif %}
+
+    {% if request.args.get("end") == "True" %}
+    <br>
+    <br>
+    <br>
+    <table class="table">
+        <thead>
+            <tr>
+                <th class="bg-success text-white rounded-top">Správně</th>
+                <th class="bg-danger text-white rounded-top">Špatně</th>
+                <th class="bg-success text-white rounded-top">Procent správně</th>
+                <th class="bg-danger text-white rounded-top">Procent špatně</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr style="font-size:2rem">
+                <td>{{ answer_correct }}</td>
+                <td>{{ answer_failed }}</td>
+                <td>{{ percentage_correct | round(1) }}%</td>
+                <td>{{ percentage_failed | round(1) }}%</td>
+            </tr>
+            <tr>
+                <td>
+                    {% for i in range(answer_correct) %}
+                    <img src="{{ url_for('static', filename='img/star2.gif') }}" alt="Hvzdička" style="width: 3rem;">
+                    {%endfor%}
+                </td>
+                <td>{% for i in range(answer_failed) %}
+                    <img src="{{ url_for('static', filename='img/pooh2.gif') }}" alt="Vtipné hovínko" style="width: 2.5rem;">
+                    {%endfor%}
+                </td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>
+                    {% for fail in failures if fail != "X" %}
+                        <span>{{fail }},</span>
+                    {%endfor%}
+                </td>
+                <td></td>
+                <td></td>
+            </tr>
+        </tbody>
+    </table>
+    <br>
+    <br>
+    <a href="{{ url_for('letters', run=False, delFile = True, end = False) }}" class="btn bg-primary text-white">Spustit kvíz</a>
+    {% endif %}
+
+</div>
+
+
+{% endblock%}

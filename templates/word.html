@@ -1,0 +1,17 @@
+{% extends "index.html" %}
+
+{% block title %}
+Kvíz slova
+{% endblock %}
+
+{% block content %}
+
+<div class="text-center">
+    <h1>Kvíz slova</h1>
+    <br>
+    <h1 style="font-size:72px">{{ word }}</h1>
+    <br>
+    <a href="{{ url_for('words') }}" class="btn bg-primary text-white">Obnovit</a>
+</div>
+
+{% endblock%}
