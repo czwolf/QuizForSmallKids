@@ -32,5 +32,5 @@ class Quiz:
 
     @staticmethod
     def failures(file_name: str):
-        df = pd.read_csv(file_name, sep=";", names=["num", "answer", "items"])
+        df = pd.read_csv(file_name, sep=";", names=["num", "answer", "items"], encoding="windows-1250")
         return df["items"].to_list()

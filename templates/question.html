@@ -1,33 +1,37 @@
 {% extends "index.html"%}
 
 {% block title %}
-Kvíz slova
+Kvíz hádanky
 {% endblock %}
 
 {% block content %}
 <div class="text-center">
-    <h1>Kvíz slova</h1>
+    <h1>Kvíz hádanky</h1>
     {% if request.args.get("run") == "False" %}
-    <p>Řekni jaké slovo vidíš na obrázku.</p>
-    <p>Rodiče volbu zkontrolují.</p>
+    <p>Odpověz správně na otázku.</p>
     {% endif %}
 
     {% if request.args.get("end") == "False" %}
-    {% if word %}
+    {% if random_value %}
     <br>
-    <h1 style="font-size:72px">{{ word }}</h1>
+    <h1 style="font-size:30px">{{ random_value }}</h1>
     <br>
+    <form action="{{ url_for('questions', run=False, delFile = False, end = False) }}" method="POST">
+        <label for="answer">Odpověď:</label>
+        <input type="text" id="answer" name="answer" required><br><br>
+        <input type="submit" value="Odeslat" class="btn btn-primary"><br><br>
+    </form>
     {%endif%}
 
     {%if request.args.get("run") == "True" %}
     <br>
-    <a href="{{ url_for('words', run=False, delFile = True, end = False) }}" class="btn bg-primary text-white">Spustit kvíz</a>
+    <a href="{{ url_for('questions', run=False, delFile = True, end = False) }}" class="btn bg-primary text-white">Spustit kvíz</a>
     {% endif %}
 
     {%if request.args.get("run") == "False" %}
-    <a href="{{ url_for('words', run=False, answer='Correct', delFile = False, end = False) }}" class="btn btn-success text-white">Správně</a>
-    <a href="{{ url_for('words', run=False, answer='Fail',delFile = False, end = False) }}" class="btn btn-danger text-white">Špatně</a>
-    <a href="{{ url_for('words', run=False, delFile = False, end = True) }}" class="btn btn-warning text-white">Ukončit kvíz</a>
+<!--    <a href="{{ url_for('questions', run=False, answer='Correct', delFile = False, end = False) }}" class="btn btn-success text-white">Správně</a>-->
+<!--    <a href="{{ url_for('questions', run=False, answer='Fail',delFile = False, end = False) }}" class="btn btn-danger text-white">Špatně</a>-->
+    <a href="{{ url_for('questions', run=False, delFile = False, end = True) }}" class="btn btn-warning text-white">Ukončit kvíz</a>
     {% endif %}
     {% endif %}
 
@@ -68,7 +72,7 @@ Kvíz slova
                 <td></td>
                 <td>
                     {% for fail in failures if fail != "X" %}
-                        <span>{{fail }},</span>
+                        <span>{{ fail }},</span>
                     {%endfor%}
                 </td>
                 <td></td>
@@ -78,7 +82,7 @@ Kvíz slova
     </table>
     <br>
     <br>
-    <a href="{{ url_for('words', run=False, delFile = True, end = False) }}" class="btn bg-primary text-white">Spustit kvíz</a>
+    <a href="{{ url_for('questions', run=False, delFile = True, end = False) }}" class="btn bg-primary text-white">Spustit kvíz</a>
     {% endif %}
 
 </div>

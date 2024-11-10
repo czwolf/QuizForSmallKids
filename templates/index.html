@@ -26,7 +26,10 @@
                         <a class="nav-link" href="{{url_for('letters', run=True,end=False)}}">Písmena</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{url_for('words')}}">Slova</a>
+                        <a class="nav-link" href="{{url_for('words', run=True,end=False)}}">Slova</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{url_for('questions', run=True,end=False)}}">Hádanky</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{{url_for('state')}}">Státy</a>
