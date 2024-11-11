@@ -156,64 +156,17 @@ def words():
 
 @app.route("/questions", methods=["GET", "POST"])
 def questions():
-    question_dict = {
-        "slunce": "Co svítí na obloze a dává nám teplo? Nápověda: Je žluté a vidíme ho hlavně přes den.",
-        "měsíc": "Co svítí na obloze v noci a mění svůj tvar? Nápověda: Je kulatý a září, když je tma.",
-        "auto": "Co jezdí po silnici a má čtyři kola? Nápověda: Může být malé nebo velké, obvykle má volant.",
-        "tráva": "Co je zelené a roste na zemi? Nápověda: Sekáme to sekačkou na zahradě.",
-        "ryba": "Jaké zvíře žije ve vodě a má ploutve? Nápověda: Je tichá a plave v jezerech nebo moři.",
-        "kočka": "Jaké zvíře má rádo mléko a vrní, když je spokojené? Nápověda: Ráda loví myši.",
-        "pes": "Jaké zvíře štěká a rádo běhá za míčkem? Nápověda: Často je nejlepším přítelem člověka.",
-        "pták": "Co létá na obloze a má peří? Nápověda: Některé druhy si staví hnízdo.",
-        "mrak": "Co je na obloze, když se schyluje k dešti? Nápověda: Může být bílý nebo šedý.",
-        "mléko": "Co pijí děti, aby měly silné kosti? Nápověda: Vyrábí se z něj sýr a jogurt.",
-        "kolo": "Na čem můžeme jezdit, když to má dvě kola a pedály? Nápověda: Děti se na tom učí rovnováhu.",
-        "včela": "Jaký hmyz vyrábí med? Nápověda: Má žluto-černé pruhy a bzučí.",
-        "zebra": "Jaké zvíře je pruhované a podobá se koni? Nápověda: Najdeme ji v Africe nebo v zoo.",
-        "čokoláda": "Jaká sladkost je hnědá a vyrábí se z kakaa? Nápověda: Často se dává jako dárek na Vánoce.",
-        "kouzelník": "Kdo dokáže předvádět triky a iluze, aby překvapil lidi? Nápověda: Nosí často klobouk a hůlku.",
-        "zima": "Jaké roční období je, když sněží a mrzne? Nápověda: Nosíme teplé oblečení a jsou Vánoce.",
-        "prst": "Co máš na ruce pětkrát? Nápověda: Pomáhá ti chytat věci.",
-        "zmrzlina": "Jaká sladkost je studená a jíme ji hlavně v létě? Nápověda: Může být vanilková nebo čokoládová.",
-        "želva": "Jaké zvíře má krunýř a pohybuje se velmi pomalu? Nápověda: Žije dlouho a umí plavat.",
-        "hřib": "Jakou rostlinu sbíráme v lese a dáváme ji do polévky? Nápověda: Je to houba s kloboukem.",
-        "letadlo": "Co létá na nebi a přepravuje lidi na dlouhé vzdálenosti? Nápověda: Má křídla a motory.",
-        "jablko": "Jaké ovoce je kulaté, červené nebo zelené a roste na stromě? Nápověda: Známe ho jako symbol zdraví.",
-        "šnek": "Jaký tvor má ulitu na zádech a pohybuje se velmi pomalu? Nápověda: Nechává za sebou slizkou stopu.",
-        "zrcadlo": "Na co se díváme, když chceme vidět svůj odraz? Nápověda: Najdeme ho v koupelně.",
-        "hory": "Kde je sníh i v létě, a lidé tam jezdí lyžovat? Nápověda: Jsou vysoké a krásné.",
-        "kamarád": "Jak nazýváme člověka, se kterým se rádi smějeme a hrajeme? Nápověda: Může to být spolužák nebo soused.",
-        "moře": "Kde je hodně vody, písek na pláži a lidé se tam koupou? Nápověda: Má slanou vodu.",
-        "králík": "Jaké zvíře má dlouhé uši a rádo chroupá mrkev? Nápověda: Žije v norách.",
-        "myš": "Jaký malý hlodavec má rád sýr a může žít v domě? Nápověda: Kočka ho často loví.",
-        "svíčka": "Co zapalujeme na dortu při oslavě narozenin? Nápověda: Hoří a dělá plamínek.",
-        "strom": "Co má kmen, větve a listy, a roste v lese? Nápověda: Dává nám kyslík.",
-        "klavír": "Na jaký hudební nástroj se hraje prsty a má černé a bílé klávesy? Nápověda: Velmi krásně zní.",
-        "vlak": "Co jezdí po kolejích a vozí lidi nebo náklad? Nápověda: Má mnoho vagónů.",
-        "knížka": "Co čteme, abychom se dozvěděli příběhy nebo naučili něco nového? Nápověda: Má stránky a může být tlustá nebo tenká.",
-        "zvon": "Co vydává hlasitý zvuk, když ho rozkýváme? Nápověda: Najdeme ho v kostele.",
-        "šachy": "Jaká hra se hraje na černobílé šachovnici s figurkami? Nápověda: Cílem je dostat krále soupeře.",
-        "balón": "Co se nafukuje a létá, když ho pustíme? Nápověda: Je barevný a děti si s ním hrají.",
-        "mráz": "Co způsobuje, že voda venku zmrzne a stromy jsou bílé? Nápověda: Je velmi studený a je v zimě.",
-        "kostka": "Jaký předmět má šest stěn a často ho používáme ve hrách? Nápověda: Na každé straně jsou tečky.",
-        "pohádka": "Jaký druh příběhu má často princezny, čaroděje a kouzel? Nápověda: Čteme ji dětem na dobrou noc.",
-        "popelka": "Která pohádková postava ztratila střevíček na bále? Nápověda: Její jméno je od slova 'popel'.",
-        "jízdní řád": "Jak se nazývá seznam časů, kdy přijíždí autobusy nebo vlaky? Nápověda: Najdeme ho na zastávkách.",
-        "polévka": "Jak se říká jídlu, které jíme lžící a bývá teplé? Nápověda: Obvykle se podává v talíři nebo misce.",
-        "čáp": "Jaký pták má dlouhé nohy a nosí miminka podle pověsti? Nápověda: Najdeme ho u rybníků.",
-        "švestka": "Jaké ovoce je tmavě modré a často se z něj dělají knedlíky? Nápověda: Roste na stromě a je sladké.",
-        "saně": "Na čem děti jezdí v zimě z kopce dolů? Nápověda: Potřebují k tomu sníh.",
-        "kačer": "Jaký vodní pták má oranžový zobák a rád plave? Nápověda: Říká 'kvák kvák'.",
-        "perník": "Jaká sladkost je kořeněná a peče se hlavně na Vánoce? Nápověda: Může mít různé tvary, třeba srdíčko.",
-        "dýně": "Jaká zelenina je oranžová, kulatá a často se vyřezává na Halloween? Nápověda: Je velká a dužnatá.",
-        "vítr": "Co vane venku a rozhýbává listy stromů? Nápověda: Cítíme ho, ale nevidíme."
-    }
-    # question_dict = {"koza":"zvíře", "praha":"město"}
+    question_set_file = "question_set_file.txt"
 
-    questions = list(question_dict.items())
-    random_key, random_value = random.choice(questions)
+    if request.method == "POST" and (request.form.get("question_set")):
+        q.set_selected_question_set(question_set_file, request.form.get("question_set"))
+
+    # questions = list(question_dict.items())
+    # random_key, random_value = random.choice(questions)
+    temp_file = "temp.csv"
     file_name = "questions.csv"
     template_name = "question.html"
+
     end = False
     answer_correct = 0
     answer_failed = 0
@@ -221,6 +174,21 @@ def questions():
     percentage_failed = 0
     failures = []
     answer = None
+    random_key = None
+    random_value = None
+
+    if os.path.exists(question_set_file):
+        sett = q.get_selected_question_set(question_set_file)
+        question_dict = q.get_questions_dict(sett)
+        questions = list(question_dict.items())
+        random_key, random_value = random.choice(questions)
+
+    if request.args.get("run") == "True" and request.args.get("end") == "False":
+        q.remove_file(temp_file)
+        q.remove_file(question_set_file)
+
+    if request.args.get("run") == "False" and request.args.get("end") != "True":
+        q.set_temp(temp_file, random_key, random_value)
 
     if request.args.get("run") == "True":
         return render_template(template_name)
@@ -233,15 +201,19 @@ def questions():
         else:
             i = 0
 
-        if request.method == "POST":
+        if request.method == "POST" and request.form.get("answer"):
             answer = request.form.get("answer")
-            print(answer, random_key)
-            if answer == random_key:
+            answer = answer.strip()
+            saved_question_data = q.read_temp_file(temp_file)
+            saved_random_key = saved_question_data[0]
+
+            if answer == saved_random_key:
                 q.set_correct_answer(file_name, i)
             else:
                 q.set_fail_answer(file_name, i, answer)
 
         if request.args.get("end") == "True":
+            q.remove_file(temp_file)
             end = True
             df = pd.read_csv(file_name, sep=";", names=["num", "answer", "item"], encoding="windows-1250")
             num_of_questions = len(df)

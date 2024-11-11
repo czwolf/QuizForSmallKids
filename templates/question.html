@@ -9,6 +9,7 @@ Kvíz hádanky
     <h1>Kvíz hádanky</h1>
     {% if request.args.get("run") == "False" %}
     <p>Odpověz správně na otázku.</p>
+    <p>Svou odpověď piš malými písmeny i když je to název.</p>
     {% endif %}
 
     {% if request.args.get("end") == "False" %}
@@ -25,12 +26,21 @@ Kvíz hádanky
 
     {%if request.args.get("run") == "True" %}
     <br>
+    <form action="{{ url_for('questions', run=False, delFile = True, end = False) }}" method="POST">
+        <label for="question_set">Vyber kategorii otázek</label>
+        <select name="question_set">
+          <option value="capital_cities_europe">Hlavní města Evropy</option>
+          <option value="general_questions">Všeobecné otázky</option>
+        </select><br><br>
+        <input type="submit" value="Spustit kvíz" class="btn btn-primary"><br><br>
+    </form>
+
+
+
     <a href="{{ url_for('questions', run=False, delFile = True, end = False) }}" class="btn bg-primary text-white">Spustit kvíz</a>
     {% endif %}
 
     {%if request.args.get("run") == "False" %}
-<!--    <a href="{{ url_for('questions', run=False, answer='Correct', delFile = False, end = False) }}" class="btn btn-success text-white">Správně</a>-->
-<!--    <a href="{{ url_for('questions', run=False, answer='Fail',delFile = False, end = False) }}" class="btn btn-danger text-white">Špatně</a>-->
     <a href="{{ url_for('questions', run=False, delFile = False, end = True) }}" class="btn btn-warning text-white">Ukončit kvíz</a>
     {% endif %}
     {% endif %}
@@ -69,6 +79,7 @@ Kvíz hádanky
                 <td></td>
             </tr>
             <tr>
+                {% if answer_failed %}
                 <td></td>
                 <td>
                     {% for fail in failures if fail != "X" %}
@@ -77,6 +88,7 @@ Kvíz hádanky
                 </td>
                 <td></td>
                 <td></td>
+                {% endif %}
             </tr>
         </tbody>
     </table>
