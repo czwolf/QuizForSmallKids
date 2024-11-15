@@ -1,9 +1,95 @@
 import os
+import random
 
 import pandas as pd
 
+# musí mít jméno
+# musí mít počet otázek - nastavit default
+# musí mít obtížnost
 
-class Quiz:
+class Quiz():
+    """
+    Base class of Quiz.
+    It creates the object of the Quiz
+    """
+    def __init__(self, name: str, file_name: str, number_of_questions: int = 10, difficult: int = 1):
+        self.name = name
+        self.file_name = file_name
+        self.number_of_questions = number_of_questions
+        self.difficult = difficult
+
+    def remove_file(self, file_name):
+        if os.path.exists(file_name):
+            os.remove(file_name)
+        else:
+            print("No file found")
+
+    def set_counter(self, file_name: str):
+        with open(file_name, "r") as file:
+            lines = file.readlines()
+            return len(lines)
+
+    def set_correct_answer(self, file_name: str, i: str):
+        with open(file_name, "a+") as file:
+            if not i:
+                file.write("1;1;X\n")
+            else:
+                file.write(f"{int(i) + 1};1;X\n")
+
+    def set_fail_answer(self, file_name: str, i: str, answer: str):
+        with open(file_name, "a+") as file:
+            if not i:
+                file.write(f"1;0;{answer}\n")
+            else:
+                file.write(f"{int(i) + 1};0;{answer}\n")
+
+    def failures(self, file_name: str):
+        df = pd.read_csv(file_name, sep=";", names=["num", "answer", "items"], encoding="windows-1250")
+        return df["items"].to_list()
+
+    def __repr__(self):
+        return (f"name = {self.name},file_name = {self.file_name}, number_of_questions = {self.number_of_questions}, difficult = {self.difficult}")
+
+
+class Numbers(Quiz):
+    """
+    Quiz numbers generate random numbers
+    :param number_type: int, float
+    """
+    def __init__(self, name: str, numbers_type: str, number_of_questions: int = 10, range_numbers: int = 100):
+        super().__init__(name, number_of_questions)
+        self.range_numbers = range_numbers
+        self.numbers_type = numbers_type
+
+    def get_random_number(self):
+        if self.numbers_type == "int":
+            return random.randint(1, self.range_numbers)
+        else:
+            return round(random.uniform(1.0, float(self.range_numbers)),1)
+
+    def __repr__(self):
+        return (f"name = {self.name}, numbers_type = {self.numbers_type}, number_of_questions = {self.number_of_questions}, difficult = {self.difficult}, range_numbers = {self.range_numbers}")
+
+
+q = Numbers(name="Numbers", numbers_type="float")
+
+print(repr(q))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+class Quiz2:
 
     @staticmethod
     def remove_file(file_name: str):
