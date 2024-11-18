@@ -7,78 +7,91 @@ Kvíz čísla
 {% block content %}
 <div class="text-center">
     <h1>Kvíz čísla</h1>
-    {% if request.args.get("run") == "False" %}
-    <p>Řekni jaké číslo vidíš na obrázku.</p>
-    <p>Rodiče volbu zkontrolují.</p>
+    {% if request.args.get("run") == "False" and request.args.get("end") != "True" %}
+        <p>Řekni jaké číslo vidíš na obrázku.</p>
+        <p>Rodiče volbu zkontrolují.</p>
     {% endif %}
 
     {% if request.args.get("end") == "False" %}
     {% if number %}
-    <br>
-    <h1 style="font-size:72px">{{ number }}</h1>
-    <br>
+        <br>
+        <h1 style="font-size:72px">{{ number }}</h1>
+        <br>
     {%endif%}
 
     {%if request.args.get("run") == "True" %}
-    <br>
-    <a href="{{ url_for('numbers', run=False, delFile = True, end = False) }}" class="btn bg-primary text-white">Spustit kvíz</a>
+        <br>
+        <h5>Druh čísel</h5>
+        <div class="form-group">
+            <form action="{{ url_for('numbers', run = False, delFile = True, end = False) }}" method="POST">
+                <input type="radio" class="form-check-input" name="numbers_type" id="int" value="int" checked>
+                <label class="form-check-label" for="int">Celá čísla [1,2,3]</label><br>
+                <input type="radio" class="form-check-input" name="numbers_type" id="float" value="float">
+                <label class="form-check-label" for="float">Desetinná čísla [1.0,2.0,3.0]</label><br><br>
+                <input type="submit" value="Spustit kvíz" class="btn btn-primary"><br><br>
+            </form>
+        </div>
+
     {% endif %}
 
     {%if request.args.get("run") == "False" %}
-    <a href="{{ url_for('numbers', run=False, answer='Correct', delFile = False, end = False) }}" class="btn btn-success text-white">Správně</a>
-    <a href="{{ url_for('numbers', run=False, answer='Fail',delFile = False, end = False) }}" class="btn btn-danger text-white">Špatně</a>
-    <a href="{{ url_for('numbers', run=False, delFile = False, end = True) }}" class="btn btn-warning text-white">Ukončit kvíz</a>
+        <a href="{{ url_for('numbers', run=False, answer='Correct', delFile = False, end = False) }}" class="btn btn-success text-white">Správně</a>
+        <a href="{{ url_for('numbers', run=False, answer='Fail',delFile = False, end = False) }}" class="btn btn-danger text-white">Špatně</a>
+        <a href="{{ url_for('numbers', run=False, delFile = False, end = True) }}" class="btn btn-warning text-white">Ukončit kvíz</a>
     {% endif %}
     {% endif %}
 
     {% if request.args.get("end") == "True" %}
-    <br>
-    <br>
-    <br>
-    <table class="table">
-        <thead>
-            <tr>
-                <th class="bg-success text-white rounded-top">Správně</th>
-                <th class="bg-danger text-white rounded-top">Špatně</th>
-                <th class="bg-success text-white rounded-top">Procent správně</th>
-                <th class="bg-danger text-white rounded-top">Procent špatně</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr style="font-size:2rem">
-                <td>{{ answer_correct }}</td>
-                <td>{{ answer_failed }}</td>
-                <td>{{ percentage_correct | round(1) }}%</td>
-                <td>{{ percentage_failed | round(1) }}%</td>
-            </tr>
-            <tr>
-                <td>
-                    {% for i in range(answer_correct) %}
-                        <img src="{{ url_for('static', filename='img/star.png') }}" alt="Hvzdička" style="width: 2rem;">
-                    {%endfor%}
-                </td>
-                <td>{% for i in range(answer_failed) %}
-                        <img src="{{ url_for('static', filename='img/pooh.png') }}" alt="Vtipné hovínko" style="width: 2rem;">
-                    {%endfor%}
-                </td>
-                <td></td>
-                <td></td>
-            </tr>
-            <tr>
-                <td></td>
-                <td>
-                    {% for fail in failures if fail != "X" %}
-                        <span>{{fail }},</span>
-                    {%endfor%}
-                </td>
-                <td></td>
-                <td></td>
-            </tr>
-        </tbody>
-    </table>
-    <br>
-    <br>
-    <a href="{{ url_for('numbers', run=False, delFile = True, end = False) }}" class="btn bg-primary text-white">Spustit kvíz</a>
+        <br>
+        <br>
+        <br>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th class="bg-success text-white rounded-top">Správně</th>
+                    <th class="bg-danger text-white rounded-top">Špatně</th>
+                    <th class="bg-success text-white rounded-top">Procent správně</th>
+                    <th class="bg-danger text-white rounded-top">Procent špatně</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr style="font-size:2rem">
+                    <td>{{ answer_correct }}</td>
+                    <td>{{ answer_failed }}</td>
+                    <td>{{ percentage_correct | round(1) }}%</td>
+                    <td>{{ percentage_failed | round(1) }}%</td>
+                </tr>
+                {% if answer_correct or answe_failed %}
+                <tr>
+                    <td>
+                        {% for i in range(answer_correct) %}
+                            <img src="{{ url_for('static', filename='img/star.png') }}" alt="Hvzdička" style="width: 2rem;">
+                        {% endfor %}
+                    </td>
+                    <td>{% for i in range(answer_failed) %}
+                            <img src="{{ url_for('static', filename='img/pooh.png') }}" alt="Vtipné hovínko" style="width: 2rem;">
+                        {% endfor %}
+                    </td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                {% endif %}
+                {% for fail in failures if fail != "X" %}
+                <tr>
+                    <td></td>
+                    <td>
+                        <span>{{fail}},</span>
+                    </td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                {% endfor %}
+
+            </tbody>
+        </table>
+        <br>
+        <br>
+        <a href="{{ url_for('numbers', run=True, delFile = True, end = False) }}" class="btn bg-primary text-white">Spustit kvíz</a>
     {% endif %}
 
 </div>
