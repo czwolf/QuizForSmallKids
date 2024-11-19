@@ -76,23 +76,40 @@ Kvíz čísla
                     <td></td>
                 </tr>
                 {% endif %}
-                {% for fail in failures if fail != "X" %}
+                {{failures}}
+                {{failures|length}}
+                {% if failures[0] != "X" or failures|length >= 1 %}
                 <tr>
                     <td></td>
                     <td>
-                        <span>{{fail}},</span>
+                        {% for fail in failures if fail != "X" %}
+                            <span>{{fail}},</span>
+                        {% endfor %}
                     </td>
                     <td></td>
                     <td></td>
                 </tr>
-                {% endfor %}
+                {% endif %}
+
 
             </tbody>
         </table>
         <br>
         <br>
         <a href="{{ url_for('numbers', run=True, delFile = True, end = False) }}" class="btn bg-primary text-white">Spustit kvíz</a>
-    {% endif %}
 
+        <br><br>
+        {% if percentage_correct >= 90 %}
+            <img src="{{ url_for('static', filename='img/gold.png') }}" alt="Zlatá medaile" style="width: 12rem;">
+        {% elif percentage_correct >= 80 and percentage_correct < 90 %}
+            <img src="{{ url_for('static', filename='img/silver.png') }}" alt="Stříbrná medaile" style="width: 12rem;">
+        {% elif percentage_correct >= 70 and percentage_correct < 80 %}
+            <img src="{{ url_for('static', filename='img/bronze.png') }}" alt="Bronzová medaile" style="width: 12rem;">
+        {% elif answer_correct == 0 and answer_failed == 0%}
+            <h3>Zkus zodpovdět alespoň jednu otázku</h3>
+        {% else %}
+            <img src="{{ url_for('static', filename='img/pooh.png') }}" alt="Hovínko" style="width: 12rem;">
+        {% endif %}
+    {% endif %}
 </div>
 {% endblock %}
