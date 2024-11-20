@@ -66,6 +66,8 @@ def numbers():
                 failures = quiz_numbers.failures(file_name)
             else:
                 pass
+
+        failures = [fail for fail in failures if fail != "X"]
         return render_template(template_name, failures=failures, number=random_number, end=end, answer_correct=answer_correct, answer_failed=answer_failed,percentage_correct=percentage_correct,percentage_failed=percentage_failed)
 
 @app.route("/letters")

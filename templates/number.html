@@ -81,18 +81,13 @@ Kvíz čísla
                 <tr>
                     <td></td>
                     <td>
-                        {% set only_true_failures = [] %}
                         {% for fail in failures %}
-                            {% if fail != "X" %}
-                                {{ only_true_failures.append(fail) }}
-                            {% endif %}
-                        {% endfor %}
-
-                        {% for fail2 in only_true_failures %}
-                            {% if only_true_failures|length == 1 %}
-                                <span>{{fail2}}</span>
+                            {% if failures|length == 1 %}
+                                <span>{{fail}}</span>
+                            {% elif fail != failures[-1]%}
+                                <span>{{fail}},</span>
                             {% else %}
-                                <span>{{fail2}},</span>
+                                <span>{{fail}}</span>
                             {% endif %}
                         {% endfor %}
                     </td>
