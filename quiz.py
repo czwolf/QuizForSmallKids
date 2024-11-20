@@ -71,6 +71,10 @@ class Numbers(Quiz):
         else:
             return round(random.uniform(1.0, float(self.range_numbers)), 1)
 
+    def save_random_number(self, number):
+        with open("random_numbers.csv", "a+") as file:
+            file.write(str(number) + "\n")
+
     def __repr__(self):
         return (
             f"name = {self.name}, numbers_type = {self.numbers_type}, number_of_questions = {self.number_of_questions}, range_numbers = {self.range_numbers}")

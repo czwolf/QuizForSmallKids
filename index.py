@@ -35,12 +35,15 @@ def numbers():
     quiz_numbers = Numbers(numbers_type=numbers_type)
 
     random_number = quiz_numbers.get_random_number()
+    if request.args.get("run") == "False" and request.args.get("end") == "False":
+        quiz_numbers.save_random_number(random_number)
 
     if request.args.get("run") == "True":
         return render_template(template_name)
     else:
         if request.args.get("delFile") == "True":
             quiz_numbers.remove_file(file_name)
+            quiz_numbers.remove_file("random_numbers.csv")
 
         if os.path.exists(file_name):
             i = quiz_numbers.set_counter(file_name)
