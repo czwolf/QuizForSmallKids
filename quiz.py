@@ -1,6 +1,7 @@
 import os
 import random
 import pandas as pd
+import string
 
 
 # musí mít jméno
@@ -72,12 +73,19 @@ class Numbers(Quiz):
 
     def __repr__(self):
         return (
-            f"name = {self.name}, numbers_type = {self.numbers_type}, number_of_questions = {self.number_of_questions}, difficult = {self.difficult}, range_numbers = {self.range_numbers}")
+            f"name = {self.name}, numbers_type = {self.numbers_type}, number_of_questions = {self.number_of_questions}, range_numbers = {self.range_numbers}")
 
+class Letters(Quiz):
+    def __init__(self, name: str = "Letters", number_of_questions: int = None):
+        super().__init__(name, number_of_questions)
 
-q = Numbers(name="Numbers", numbers_type="float")
+    def get_random_letter(self):
+        return random.choice(string.ascii_uppercase)
 
-print(q.get_random_number())
+    def __repr__(self):
+        return (
+            f"name = {self.name}, number_of_questions = {self.number_of_questions}")
+
 
 
 class Quiz2:

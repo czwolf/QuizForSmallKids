@@ -3,7 +3,7 @@ from flask import Flask, render_template, request, redirect, url_for, session
 import string
 import os
 import pandas as pd
-from quiz import Quiz2 as q, Quiz, Numbers
+from quiz import Quiz2 as q, Quiz, Numbers, Letters
 
 app = Flask(__name__)
 
@@ -72,8 +72,6 @@ def numbers():
 def letters():
     file_name = "letters.csv"
     template_name = "letter.html"
-    letter = random.choice(string.ascii_uppercase)
-    letter_lower = letter.lower()
     end = False
     answer_correct = 0
     answer_failed = 0
@@ -81,22 +79,27 @@ def letters():
     percentage_failed = 0
     failures = []
 
+    quiz_letters = Letters()
+
+    letter = quiz_letters.get_random_letter()
+    letter_lower = letter.lower()
+
     if request.args.get("run") == "True":
         return render_template(template_name)
     else:
         if request.args.get("delFile") == "True":
-            q.remove_file(file_name)
+            quiz_letters.remove_file(file_name)
 
         if os.path.exists(file_name):
-            i = q.set_counter(file_name)
+            i = quiz_letters.set_counter(file_name)
         else:
             i = 0
 
         if request.args.get("answer") == "Correct":
-            q.set_correct_answer(file_name, i)
+            quiz_letters.set_correct_answer(file_name, i)
 
         if request.args.get("answer") == "Fail":
-            q.set_fail_answer(file_name, i, str(letter))
+            quiz_letters.set_fail_answer(file_name, i, str(letter))
 
         if request.args.get("end") == "True":
             end = True
@@ -106,7 +109,7 @@ def letters():
             answer_failed = num_of_questions - answer_correct
             percentage_correct = (answer_correct / num_of_questions) * 100
             percentage_failed = (answer_failed / num_of_questions) * 100
-            failures = q.failures(file_name)
+            failures = quiz_letters.failures(file_name)
 
         return render_template(template_name, failures=failures, letter=letter,letter_lower=letter_lower, end=end,
                                answer_correct=answer_correct, answer_failed=answer_failed,
