@@ -1,0 +1,13 @@
+<div class="pt-4">
+    {% if percentage_correct >= 90 %}
+        <img src="{{ url_for('static', filename='img/gold.png') }}" alt="Zlatá medaile" style="width: 20rem;">
+    {% elif percentage_correct >= 80 and percentage_correct < 90 %}
+        <img src="{{ url_for('static', filename='img/silver.png') }}" alt="Stříbrná medaile" style="width: 20rem;">
+    {% elif percentage_correct >= 70 and percentage_correct < 80 %}
+        <img src="{{ url_for('static', filename='img/bronze.png') }}" alt="Bronzová medaile" style="width: 20rem;">
+    {% elif answer_correct == 0 and answer_failed == 0%}
+        <h3>Zkus zodpovdět alespoň jednu otázku</h3>
+    {% else %}
+        <img src="{{ url_for('static', filename='img/pooh.png') }}" alt="Hovínko" style="width: 12rem;">
+    {% endif %}
+</div>
