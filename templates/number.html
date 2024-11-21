@@ -20,16 +20,17 @@ Kvíz čísla
     {%endif%}
 
     {%if request.args.get("run") == "True" %}
-        <br>
-        <h5>Druh čísel</h5>
-        <div class="form-group">
-            <form action="{{ url_for('numbers', run = False, delFile = True, end = False) }}" method="POST">
-                <input type="radio" class="form-check-input" name="numbers_type" id="int" value="int" checked>
-                <label class="form-check-label" for="int">Celá čísla [1,2,3]</label><br>
-                <input type="radio" class="form-check-input" name="numbers_type" id="float" value="float">
-                <label class="form-check-label" for="float">Desetinná čísla [1.0,2.0,3.0]</label><br><br>
-                <input type="submit" value="Spustit kvíz" class="btn btn-primary"><br><br>
-            </form>
+        <div class="mt-3">
+            <h5>Druh čísel</h5>
+            <div class="form-group">
+                <form action="{{ url_for('numbers', run = False, delFile = True, end = False) }}" method="POST">
+                    <input type="radio" class="form-check-input" name="numbers_type" id="int" value="int" checked>
+                    <label class="form-check-label" for="int">Celá čísla [1,2,3]</label><br>
+                    <input type="radio" class="form-check-input" name="numbers_type" id="float" value="float">
+                    <label class="form-check-label" for="float">Desetinná čísla [1.0,2.0,3.0]</label><br><br>
+                    <input type="submit" value="Spustit kvíz" class="btn btn-primary mt-2">
+                </form>
+            </div>
         </div>
 
     {% endif %}
@@ -42,9 +43,7 @@ Kvíz čísla
     {% endif %}
 
     {% if request.args.get("end") == "True" %}
-        <br>
-        <br>
-        <br>
+        <div class="mt-5">
         <table class="table">
             <thead>
                 <tr>
@@ -98,10 +97,12 @@ Kvíz čísla
 
             </tbody>
         </table>
+    </div>
     <div class="mt-5">
         <a href="{{ url_for('numbers', run=True, delFile = True, end = False) }}" class="btn bg-primary text-white">Spustit kvíz</a>
     </div>
-        {% include 'medail_decision.html' %}
+
+    {% include 'medail_decision.html' %}
 
     {% endif %}
 </div>
