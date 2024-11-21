@@ -1,45 +1,40 @@
 {% extends "index.html"%}
 
-{% block title %}
-Kvíz čísla
-{% endblock %}
+{% block title %}Kvíz čísla{% endblock %}
 
 {% block content %}
 <div class="text-center">
-    <h1>Kvíz čísla</h1>
+    <h1 class="mb-2">Kvíz čísla</h1>
     {% if request.args.get("run") == "False" and request.args.get("end") != "True" %}
         <p>Řekni jaké číslo vidíš na obrázku.</p>
         <p>Rodiče odpověď zkontrolují.</p>
     {% endif %}
 
     {% if request.args.get("end") == "False" %}
-    {% if number %}
-        <br>
-        <h1 style="font-size:72px">{{ number }}</h1>
-        <br>
-    {%endif%}
+        {% if number %}
+            <h1 style="font-size:72px" class="mt-4 mb-4">{{ number }}</h1>
+        {%endif%}
 
-    {%if request.args.get("run") == "True" %}
-        <div class="mt-3">
-            <h5>Druh čísel</h5>
-            <div class="form-group">
-                <form action="{{ url_for('numbers', run = False, delFile = True, end = False) }}" method="POST">
-                    <input type="radio" class="form-check-input" name="numbers_type" id="int" value="int" checked>
-                    <label class="form-check-label" for="int">Celá čísla [1,2,3]</label><br>
-                    <input type="radio" class="form-check-input" name="numbers_type" id="float" value="float">
-                    <label class="form-check-label" for="float">Desetinná čísla [1.0,2.0,3.0]</label><br><br>
-                    <input type="submit" value="Spustit kvíz" class="btn btn-primary mt-2">
-                </form>
+        {%if request.args.get("run") == "True" %}
+            <div class="mt-3">
+                <h5>Druh čísel</h5>
+                <div class="form-group">
+                    <form action="{{ url_for('numbers', run = False, delFile = True, end = False) }}" method="POST">
+                        <input type="radio" class="form-check-input" name="numbers_type" id="int" value="int" checked>
+                        <label class="form-check-label" for="int">Celá čísla [1,2,3]</label><br>
+                        <input type="radio" class="form-check-input" name="numbers_type" id="float" value="float">
+                        <label class="form-check-label" for="float">Desetinná čísla [1.0,2.0,3.0]</label><br><br>
+                        <input type="submit" value="Spustit kvíz" class="btn btn-primary mt-2">
+                    </form>
+                </div>
             </div>
-        </div>
+        {% endif %}
 
-    {% endif %}
-
-    {%if request.args.get("run") == "False" %}
-        <a href="{{ url_for('numbers', run=False, answer='Correct', delFile = False, end = False) }}" class="btn btn-success text-white">Správně</a>
-        <a href="{{ url_for('numbers', run=False, answer='Fail',delFile = False, end = False) }}" class="btn btn-danger text-white">Špatně</a>
-        <a href="{{ url_for('numbers', run=False, delFile = False, end = True) }}" class="btn btn-warning text-white">Ukončit kvíz</a>
-    {% endif %}
+        {%if request.args.get("run") == "False" %}
+            <a href="{{ url_for('numbers', run=False, answer='Correct', delFile = False, end = False) }}" class="btn btn-success text-white">Správně</a>
+            <a href="{{ url_for('numbers', run=False, answer='Fail',delFile = False, end = False) }}" class="btn btn-danger text-white">Špatně</a>
+            <a href="{{ url_for('numbers', run=False, delFile = False, end = True) }}" class="btn btn-warning text-white">Ukončit kvíz</a>
+        {% endif %}
     {% endif %}
 
     {% if request.args.get("end") == "True" %}
@@ -94,7 +89,6 @@ Kvíz čísla
                     <td></td>
                 </tr>
                 {% endif %}
-
             </tbody>
         </table>
     </div>
@@ -102,7 +96,7 @@ Kvíz čísla
         <a href="{{ url_for('numbers', run=True, delFile = True, end = False) }}" class="btn bg-primary text-white">Spustit kvíz</a>
     </div>
 
-    {% include 'medail_decision.html' %}
+    {% include 'medal_result.html' %}
 
     {% endif %}
 </div>

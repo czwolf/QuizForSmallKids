@@ -6,9 +6,9 @@ import pandas as pd
 from quiz import Quiz2 as q, Quiz, Numbers, Letters
 
 app = Flask(__name__)
+secret_key = os.urandom(10)
 
-app.secret_key = 'quiz_key'
-
+app.secret_key = secret_key
 
 @app.route("/")
 def home():
@@ -35,6 +35,7 @@ def numbers():
     quiz_numbers = Numbers(numbers_type=numbers_type)
 
     random_number = quiz_numbers.get_random_number()
+
     if request.args.get("run") == "False" and request.args.get("end") == "False":
         quiz_numbers.save_random_number(random_number)
 

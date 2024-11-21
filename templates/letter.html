@@ -1,42 +1,35 @@
 {% extends "index.html"%}
 
-{% block title %}
-Kvíz písmena
-{% endblock %}
+{% block title %}Kvíz písmena{% endblock %}
 
 {% block content %}
 <div class="text-center">
-    <h1>Kvíz písmena</h1>
+    <h1 class="mb-2">Kvíz písmena</h1>
     {% if request.args.get("run") == "False" and request.args.get("end") != "True" %}
         <p>Řekni jaké písmeno vidíš na obrázku.</p>
         <p>Rodiče odpověď zkontrolují.</p>
     {% endif %}
 
-    {% if request.args.get("end") == "False" %}
-    {% if letter %}
-        <br>
-        <h1 style="font-size:72px">{{ letter }}</h1>
-        <h1 style="font-size:72px">{{ letter_lower }}</h1>
-        <br>
-    {%endif%}
-
     {%if request.args.get("run") == "True" %}
-        <br>
-        <a href="{{ url_for('letters', run = False, delFile = True, end = False) }}" class="btn btn-primary text-white">Spustit kvíz</a>
-
+        <div class="mt-4">
+            <a href="{{ url_for('letters', run = False, delFile = True, end = False) }}" class="btn btn-primary">Spustit kvíz</a>
+        </div>
     {% endif %}
 
-    {%if request.args.get("run") == "False" %}
-        <a href="{{ url_for('letters', run=False, answer='Correct', delFile = False, end = False) }}" class="btn btn-success text-white">Správně</a>
-        <a href="{{ url_for('letters', run=False, answer='Fail',delFile = False, end = False) }}" class="btn btn-danger text-white">Špatně</a>
-        <a href="{{ url_for('letters', run=False, delFile = False, end = True) }}" class="btn btn-warning text-white">Ukončit kvíz</a>
-    {% endif %}
+    {% if request.args.get("end") == "False" %}
+        {% if letter %}
+            <h1 style="font-size:72px" class="mt-4 mb-4">{{ letter }}</h1>
+        {%endif%}
+
+        {%if request.args.get("run") == "False" %}
+            <a href="{{ url_for('letters', run=False, answer='Correct', delFile = False, end = False) }}" class="btn btn-success text-white">Správně</a>
+            <a href="{{ url_for('letters', run=False, answer='Fail',delFile = False, end = False) }}" class="btn btn-danger text-white">Špatně</a>
+            <a href="{{ url_for('letters', run=False, delFile = False, end = True) }}" class="btn btn-warning text-white">Ukončit kvíz</a>
+        {% endif %}
     {% endif %}
 
     {% if request.args.get("end") == "True" %}
-        <br>
-        <br>
-        <br>
+        <div class="mt-5">
         <table class="table">
             <thead>
                 <tr>
@@ -68,37 +61,34 @@ Kvíz písmena
                     <td></td>
                 </tr>
                 {% endif %}
-                {% for fail in failures if fail != "X" %}
+
+                {% if failures and not (failures|length == 1 and failures[0] == 'X') and not (failures == ['X'] * failures|length) %}
                 <tr>
                     <td></td>
                     <td>
-                        <span>{{fail}},</span>
+                        {% for fail in failures %}
+                            {% if failures|length == 1 %}
+                                <span>{{fail}}</span>
+                            {% elif fail != failures[-1]%}
+                                <span>{{fail}},</span>
+                            {% else %}
+                                <span>{{fail}}</span>
+                            {% endif %}
+                        {% endfor %}
                     </td>
                     <td></td>
                     <td></td>
                 </tr>
-                {% endfor %}
-
+                {% endif %}
             </tbody>
         </table>
-        <br>
-        <br>
+    </div>
+    <div class="mt-5">
         <a href="{{ url_for('letters', run=True, delFile = True, end = False) }}" class="btn bg-primary text-white">Spustit kvíz</a>
+    </div>
 
-        <br><br>
-        {% if percentage_correct >= 90 %}
-            <img src="{{ url_for('static', filename='img/gold.png') }}" alt="Zlatá medaile" style="width: 20rem;">
-        {% elif percentage_correct >= 80 and percentage_correct < 90 %}
-            <img src="{{ url_for('static', filename='img/silver.png') }}" alt="Stříbrná medaile" style="width: 20rem;">
-        {% elif percentage_correct >= 70 and percentage_correct < 80 %}
-            <img src="{{ url_for('static', filename='img/bronze.png') }}" alt="Bronzová medaile" style="width: 20rem;">
-        {% elif answer_correct == 0 and answer_failed == 0%}
-            <h3>Zkus zodpovdět alespoň jednu otázku</h3>
-        {% else %}
-            <img src="{{ url_for('static', filename='img/pooh.png') }}" alt="Hovínko" style="width: 12rem;">
-        {% endif %}
+    {% include 'medal_result.html' %}
 
     {% endif %}
-
 </div>
 {% endblock %}
