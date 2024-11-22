@@ -21,10 +21,10 @@ class Quiz:
         self.difficult = difficult
 
     def remove_file(self, file_name):
-        if os.path.exists(file_name):
+        try:
             os.remove(file_name)
-        else:
-            print("No file with quiz statistics found")
+        except FileNotFoundError:
+            print(f"{file_name} not found!")
 
     def set_counter(self, file_name: str):
         with open(file_name, "r") as file:
@@ -65,6 +65,7 @@ class Numbers(Quiz):
         self.range_numbers = range_numbers
         self.numbers_type = numbers_type
 
+
     def get_random_number(self):
         if self.numbers_type == "int":
             return random.randint(1, self.range_numbers)
@@ -72,8 +73,11 @@ class Numbers(Quiz):
             return round(random.uniform(1.0, float(self.range_numbers)), 1)
 
     def save_random_number(self, number):
-        with open("random_numbers.csv", "w") as file:
-            file.write(str(number) + "\n")
+        file = open("random_numbers.csv", "a+")
+        file.write(str(number)+"\n")
+        # with open("random_numbers.csv", "a+") as file:
+        #     file.write(str(number) + "\n")
+
 
     def __repr__(self):
         return (

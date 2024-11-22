@@ -32,16 +32,20 @@ def numbers():
             numbers_type = request.form.get("numbers_type")
             session["numbers_type"] = numbers_type
 
-    quiz_numbers = Numbers(numbers_type=numbers_type)
-
-    random_number = quiz_numbers.get_random_number()
-
-    if request.args.get("run") == "False" and request.args.get("end") == "False":
-        quiz_numbers.save_random_number(random_number)
-
     if request.args.get("run") == "True":
         return render_template(template_name)
     else:
+
+        quiz_numbers = Numbers(numbers_type=numbers_type)
+
+        random_number = quiz_numbers.get_random_number()
+
+        if request.args.get("end") == "False":
+            session["random_number"] = random_number
+        print(random_number)
+        print(session)
+        print(request.args.get("answer"))
+
         if request.args.get("delFile") == "True":
             quiz_numbers.remove_file(file_name)
             quiz_numbers.remove_file("random_numbers.csv")
@@ -57,9 +61,17 @@ def numbers():
         if request.args.get("answer") == "Fail":
             quiz_numbers.set_fail_answer(file_name, i, str(random_number))
 
+            if "random_number" in session:
+                quiz_numbers.save_random_number(session["random_number"])
+
+
         if request.args.get("end") == "True":
             end = True
             session.pop("numbers_type")
+            try:
+                session.pop("random_number")
+            except:
+                pass
             if os.path.exists(file_name):
                 df = pd.read_csv(file_name, sep=";", names=["num", "answer", "item"])
                 num_of_questions = len(df)
