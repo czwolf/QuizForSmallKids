@@ -55,7 +55,7 @@
                     <td>{{ percentage_correct | round(1) }}%</td>
                     <td>{{ percentage_failed | round(1) }}%</td>
                 </tr>
-                {% if answer_correct or answe_failed %}
+                {% if answer_correct or answer_failed %}
                 <tr>
                     <td>
                         {% for i in range(answer_correct) %}
@@ -70,6 +70,7 @@
                     <td></td>
                 </tr>
                 {% endif %}
+                {{failures}}
 
                 {% if failures and not (failures|length == 1 and failures[0] == 'X') and not (failures == ['X'] * failures|length) %}
                 <tr>

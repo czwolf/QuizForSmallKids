@@ -2,6 +2,7 @@ import os
 import random
 import pandas as pd
 import string
+from abc import ABC, abstractmethod
 
 
 # musí mít jméno
@@ -10,8 +11,7 @@ import string
 
 class Quiz:
     """
-    Base class of Quiz.
-    It creates the object of the Quiz
+    Base class for all Quiz.
     """
 
     def __init__(self, name: str, file_name: str, number_of_questions: int = None, difficult: int = 1):
@@ -27,36 +27,45 @@ class Quiz:
             print(f"{file_name} not found!")
 
     def set_counter(self, file_name: str):
-        with open(file_name, "r") as file:
-            lines = file.readlines()
-            return len(lines)
+        try:
+            with open(file_name, "r") as file:
+                lines = file.readlines()
+                return len(lines)
+        except FileNotFoundError:
+            print(f"{file_name} not found!")
 
     def set_correct_answer(self, file_name: str, i: str):
-        with open(file_name, "a+") as file:
-            if not i:
-                file.write("1;1;X\n")
-            else:
-                file.write(f"{int(i) + 1};1;X\n")
+        try:
+            with open(file_name, "a+") as file:
+                if not i:
+                    file.write("1;1;X\n")
+                else:
+                    file.write(f"{int(i) + 1};1;X\n")
+        except FileNotFoundError:
+            print(f"{file_name} not found!")
 
     def set_fail_answer(self, file_name: str, i: str, answer: str):
-        with open(file_name, "a+") as file:
-            if not i:
-                file.write(f"1;0;{answer}\n")
-            else:
-                file.write(f"{int(i) + 1};0;{answer}\n")
+        try:
+            with open(file_name, "a+") as file:
+                if not i:
+                    file.write(f"1;0;{answer}\n")
+                else:
+                    file.write(f"{int(i) + 1};0;{answer}\n")
+        except FileNotFoundError:
+            print(f"{file_name} not found!")
 
-    def failures(self, file_name: str):
-        df = pd.read_csv(file_name, sep=";", names=["num", "answer", "items"], encoding="windows-1250")
-        return df["items"].to_list()
+    @abstractmethod
+    def get_failures(self, file_name: str):
+        pass
 
     def __repr__(self):
         return (
             f"name = {self.name}, file_name = {self.file_name}, number_of_questions = {self.number_of_questions}, difficult = {self.difficult}")
 
 
-class Numbers(Quiz):
+class Numbers(Quiz, ABC):
     """
-    Quiz numbers generate random numbers
+    Quiz numbers
     :param number_type: int, float
     """
 
@@ -64,10 +73,12 @@ class Numbers(Quiz):
         super().__init__(name, number_of_questions)
         self.range_numbers = range_numbers
 
-    def save_wrong_answer_number(self, number):
-        file = open("wrong_answer_number.csv", "a+")
-        file.write(str(number) + "\n")
-
+    def save_wrong_answer_number(self, filename: str, number: str):
+        try:
+            file = open(filename, "a+")
+            file.write(str(number) + "\n")
+        except FileNotFoundError:
+            print(f"{file_name} not found!")
 
     def __repr__(self):
         return (
@@ -75,11 +86,23 @@ class Numbers(Quiz):
 
 
 class NumbersInt(Numbers):
+    """
+    Quiz with integer numbers
+    """
     def __init__(self, name: str = "NumbersInt", number_of_questions: int = None, range_numbers: int = 100):
         super().__init__(name, number_of_questions, range_numbers)
 
     def get_random_number(self):
         return random.randint(1, self.range_numbers)
+
+    def get_failures(self, file_name: str):
+        try:
+            with open(file_name, "r") as file:
+                data = file.readlines()
+                data_cleared = [item.strip() for item in data]
+                return data_cleared
+        except FileNotFoundError:
+            print(f"{file_name} not found!")
 
     def __repr__(self):
         return (
@@ -87,16 +110,27 @@ class NumbersInt(Numbers):
 
 
 class NumbersFloat(Numbers):
+    """
+    Quiz with float numbers with one decimal number
+    """
     def __init__(self, name: str = "NumbersFloat", number_of_questions: int = None, range_numbers: int = 100):
         super().__init__(name, number_of_questions, range_numbers)
 
     def get_random_number(self):
         return round(random.uniform(1.0, float(self.range_numbers)), 1)
 
+    def get_failures(self, file_name: str):
+        try:
+            with open(file_name, "r") as file:
+                data = file.readlines()
+                data_cleared = [item.strip() for item in data]
+                return data_cleared
+        except FileNotFoundError:
+            print(f"{file_name} not found!")
+
     def __repr__(self):
         return (
             f"name = {self.name}, number_of_questions = {self.number_of_questions}, range_numbers = {self.range_numbers}")
-
 
 
 class Letters(Quiz):
@@ -111,9 +145,7 @@ class Letters(Quiz):
             f"name = {self.name}, number_of_questions = {self.number_of_questions}")
 
 
-
 class Quiz2:
-
     @staticmethod
     def remove_file(file_name: str):
         if os.path.exists(file_name):

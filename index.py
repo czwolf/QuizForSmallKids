@@ -19,7 +19,7 @@ def numbers():
 
     file_name = "answered_numbers.csv"
     template_name = "number.html"
-    wrong_answer_number = "wrong_answered_numbers.csv"
+    wrong_answered_number = "wrong_answered_numbers.csv"
     end = False
     answer_correct = 0
     answer_failed = 0
@@ -44,15 +44,9 @@ def numbers():
             quiz_numbers = NumbersFloat()
             random_number = quiz_numbers.get_random_number()
 
-        print(quiz_numbers)
-
-        print(f"random_number {random_number}")
-        print(f"Session: {session}")
-        print(f"Odpověď: {request.args.get('answer')}")
-
         if request.args.get("delFile") == "True":
             quiz_numbers.remove_file(file_name)
-            quiz_numbers.remove_file(wrong_answer_number)
+            quiz_numbers.remove_file(wrong_answered_number)
 
         if os.path.exists(file_name):
             i = quiz_numbers.set_counter(file_name)
@@ -64,7 +58,7 @@ def numbers():
 
         if request.args.get("answer") == "Fail" and request.args.get("number"):
             quiz_numbers.set_fail_answer(file_name, i, str(random_number))
-            quiz_numbers.save_wrong_answer_number(request.args.get("number"))
+            quiz_numbers.save_wrong_answer_number(wrong_answered_number, request.args.get("number"))
 
         if request.args.get("end") == "True":
             end = True
@@ -80,7 +74,10 @@ def numbers():
                 answer_failed = num_of_questions - answer_correct
                 percentage_correct = (answer_correct / num_of_questions) * 100
                 percentage_failed = (answer_failed / num_of_questions) * 100
-                failures = quiz_numbers.failures(file_name)
+                try:
+                    failures = quiz_numbers.get_failures(wrong_answered_number)
+                except FileNotFoundError:
+                    pass
             else:
                 pass
 
