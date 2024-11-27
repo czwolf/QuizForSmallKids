@@ -51,7 +51,7 @@ class Quiz:
 
     def __repr__(self):
         return (
-            f"name = {self.name},file_name = {self.file_name}, number_of_questions = {self.number_of_questions}, difficult = {self.difficult}")
+            f"name = {self.name}, file_name = {self.file_name}, number_of_questions = {self.number_of_questions}, difficult = {self.difficult}")
 
 
 class Numbers(Quiz):
@@ -60,28 +60,44 @@ class Numbers(Quiz):
     :param number_type: int, float
     """
 
-    def __init__(self, name: str = "Numbers", numbers_type: str = "int", number_of_questions: int = None, range_numbers: int = 100):
+    def __init__(self, name, number_of_questions: int = None, range_numbers: int = 100):
         super().__init__(name, number_of_questions)
         self.range_numbers = range_numbers
-        self.numbers_type = numbers_type
 
-
-    def get_random_number(self):
-        if self.numbers_type == "int":
-            return random.randint(1, self.range_numbers)
-        else:
-            return round(random.uniform(1.0, float(self.range_numbers)), 1)
-
-    def save_random_number(self, number):
-        file = open("random_numbers.csv", "a+")
-        file.write(str(number)+"\n")
-        # with open("random_numbers.csv", "a+") as file:
-        #     file.write(str(number) + "\n")
+    def save_wrong_answer_number(self, number):
+        file = open("wrong_answer_number.csv", "a+")
+        file.write(str(number) + "\n")
 
 
     def __repr__(self):
         return (
-            f"name = {self.name}, numbers_type = {self.numbers_type}, number_of_questions = {self.number_of_questions}, range_numbers = {self.range_numbers}")
+            f"name = {self.name}, number_of_questions = {self.number_of_questions}, range_numbers = {self.range_numbers}")
+
+
+class NumbersInt(Numbers):
+    def __init__(self, name: str = "NumbersInt", number_of_questions: int = None, range_numbers: int = 100):
+        super().__init__(name, number_of_questions, range_numbers)
+
+    def get_random_number(self):
+        return random.randint(1, self.range_numbers)
+
+    def __repr__(self):
+        return (
+            f"name = {self.name}, number_of_questions = {self.number_of_questions}, range_numbers = {self.range_numbers}")
+
+
+class NumbersFloat(Numbers):
+    def __init__(self, name: str = "NumbersFloat", number_of_questions: int = None, range_numbers: int = 100):
+        super().__init__(name, number_of_questions, range_numbers)
+
+    def get_random_number(self):
+        return round(random.uniform(1.0, float(self.range_numbers)), 1)
+
+    def __repr__(self):
+        return (
+            f"name = {self.name}, number_of_questions = {self.number_of_questions}, range_numbers = {self.range_numbers}")
+
+
 
 class Letters(Quiz):
     def __init__(self, name: str = "Letters", number_of_questions: int = None):

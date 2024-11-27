@@ -3,7 +3,7 @@ from flask import Flask, render_template, request, redirect, url_for, session
 import string
 import os
 import pandas as pd
-from quiz import Quiz2 as q, Quiz, Numbers, Letters
+from quiz import Quiz2 as q, Quiz, Numbers, NumbersInt, NumbersFloat, Letters
 
 app = Flask(__name__)
 secret_key = os.urandom(10)
@@ -17,8 +17,9 @@ def home():
 @app.route("/numbers", methods = ["POST", "GET"])
 def numbers():
 
-    file_name = "numbers.csv"
+    file_name = "answered_numbers.csv"
     template_name = "number.html"
+    wrong_answer_number = "wrong_answered_numbers.csv"
     end = False
     answer_correct = 0
     answer_failed = 0
@@ -34,21 +35,24 @@ def numbers():
 
     if request.args.get("run") == "True":
         return render_template(template_name)
+
     else:
+        if numbers_type == "int":
+            quiz_numbers = NumbersInt()
+            random_number = quiz_numbers.get_random_number()
+        else:
+            quiz_numbers = NumbersFloat()
+            random_number = quiz_numbers.get_random_number()
 
-        quiz_numbers = Numbers(numbers_type=numbers_type)
+        print(quiz_numbers)
 
-        random_number = quiz_numbers.get_random_number()
-
-        if request.args.get("end") == "False":
-            session["random_number"] = random_number
-        print(random_number)
-        print(session)
-        print(request.args.get("answer"))
+        print(f"random_number {random_number}")
+        print(f"Session: {session}")
+        print(f"Odpověď: {request.args.get('answer')}")
 
         if request.args.get("delFile") == "True":
             quiz_numbers.remove_file(file_name)
-            quiz_numbers.remove_file("random_numbers.csv")
+            quiz_numbers.remove_file(wrong_answer_number)
 
         if os.path.exists(file_name):
             i = quiz_numbers.set_counter(file_name)
@@ -58,12 +62,9 @@ def numbers():
         if request.args.get("answer") == "Correct":
             quiz_numbers.set_correct_answer(file_name, i)
 
-        if request.args.get("answer") == "Fail":
+        if request.args.get("answer") == "Fail" and request.args.get("number"):
             quiz_numbers.set_fail_answer(file_name, i, str(random_number))
-
-            if "random_number" in session:
-                quiz_numbers.save_random_number(session["random_number"])
-
+            quiz_numbers.save_wrong_answer_number(request.args.get("number"))
 
         if request.args.get("end") == "True":
             end = True

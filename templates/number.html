@@ -32,7 +32,7 @@
 
         {%if request.args.get("run") == "False" %}
             <a href="{{ url_for('numbers', run=False, answer='Correct', delFile = False, end = False) }}" class="btn btn-success text-white">Správně</a>
-            <a href="{{ url_for('numbers', run=False, answer='Fail',delFile = False, end = False) }}" class="btn btn-danger text-white">Špatně</a>
+            <a href="{{ url_for('numbers', run=False, answer='Fail',delFile = False, end = False, number = number) }}" class="btn btn-danger text-white">Špatně</a>
             <a href="{{ url_for('numbers', run=False, delFile = False, end = True) }}" class="btn btn-warning text-white">Ukončit kvíz</a>
         {% endif %}
     {% endif %}
