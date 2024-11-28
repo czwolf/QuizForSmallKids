@@ -14,10 +14,11 @@ app.secret_key = secret_key
 def home():
     return render_template("home.html")
 
-@app.route("/numbers", methods = ["POST", "GET"])
+
+@app.route("/numbers", methods=["POST", "GET"])
 def numbers():
 
-    file_name = "answered_numbers.csv"
+    all_answers = "answered_numbers.csv"
     template_name = "number.html"
     wrong_answered_number = "wrong_answered_numbers.csv"
     end = False
@@ -45,19 +46,19 @@ def numbers():
             random_number = quiz_numbers.get_random_number()
 
         if request.args.get("delFile") == "True":
-            quiz_numbers.remove_file(file_name)
+            quiz_numbers.remove_file(all_answers)
             quiz_numbers.remove_file(wrong_answered_number)
 
-        if os.path.exists(file_name):
-            i = quiz_numbers.set_counter(file_name)
+        if os.path.exists(all_answers):
+            i = quiz_numbers.set_counter(all_answers)
         else:
             i = 0
 
         if request.args.get("answer") == "Correct":
-            quiz_numbers.set_correct_answer(file_name, i)
+            quiz_numbers.set_correct_answer(all_answers, i)
 
         if request.args.get("answer") == "Fail" and request.args.get("number"):
-            quiz_numbers.set_fail_answer(file_name, i, str(random_number))
+            quiz_numbers.set_fail_answer(all_answers, i, str(random_number))
             quiz_numbers.save_wrong_answer_number(wrong_answered_number, request.args.get("number"))
 
         if request.args.get("end") == "True":
@@ -67,8 +68,9 @@ def numbers():
                 session.pop("random_number")
             except:
                 pass
-            if os.path.exists(file_name):
-                df = pd.read_csv(file_name, sep=";", names=["num", "answer", "item"])
+
+            if os.path.exists(all_answers):
+                df = pd.read_csv(all_answers, sep=";", names=["num", "answer", "item"])
                 num_of_questions = len(df)
                 answer_correct = df["answer"].sum()
                 answer_failed = num_of_questions - answer_correct
@@ -81,7 +83,10 @@ def numbers():
             else:
                 pass
 
-        return render_template(template_name, failures=failures, number=random_number, end=end, answer_correct=answer_correct, answer_failed=answer_failed,percentage_correct=percentage_correct,percentage_failed=percentage_failed)
+        return render_template(template_name, failures=failures, number=random_number, end=end,
+                               answer_correct=answer_correct, answer_failed=answer_failed,
+                               percentage_correct=percentage_correct, percentage_failed=percentage_failed)
+
 
 @app.route("/letters")
 def letters():
@@ -129,6 +134,7 @@ def letters():
         return render_template(template_name, failures=failures, letter=letter,letter_lower=letter_lower, end=end,
                                answer_correct=answer_correct, answer_failed=answer_failed,
                                percentage_correct=percentage_correct, percentage_failed=percentage_failed)
+
 
 @app.route("/words")
 def words():
@@ -187,6 +193,7 @@ def words():
         return render_template(template_name, failures=failures, word=word, letter_lower=letter_lower, end=end,
                                answer_correct=answer_correct, answer_failed=answer_failed,
                                percentage_correct=percentage_correct, percentage_failed=percentage_failed)
+
 
 @app.route("/questions", methods=["GET", "POST"])
 def questions():
@@ -267,9 +274,11 @@ def questions():
 def state():
     return render_template("state.html")
 
+
 @app.route("/city")
 def city():
     return render_template("city.html")
+
 
 if __name__ == '__main__':
     app.run(debug=True)
