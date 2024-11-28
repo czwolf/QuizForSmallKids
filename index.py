@@ -58,7 +58,7 @@ def numbers():
             quiz_numbers.set_correct_answer(all_answers, i)
 
         if request.args.get("answer") == "Fail" and request.args.get("number"):
-            quiz_numbers.set_fail_answer(all_answers, i, str(random_number))
+            quiz_numbers.set_wrong_answer(all_answers, i, str(random_number))
             quiz_numbers.save_wrong_answer_number(wrong_answered_number, request.args.get("number"))
 
         if request.args.get("end") == "True":

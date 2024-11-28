@@ -44,7 +44,7 @@ class Quiz:
         except FileNotFoundError:
             print(f"{file_name} not found!")
 
-    def set_fail_answer(self, file_name: str, i: str, answer: str):
+    def set_wrong_answer(self, file_name: str, i: str, answer: str):
         try:
             with open(file_name, "a+") as file:
                 if not i:
@@ -78,6 +78,15 @@ class Numbers(Quiz, ABC):
             file = open(filename, "a+")
             file.write(str(number) + "\n")
         except FileNotFoundError:
+            print(f"{filename} not found!")
+
+    def get_failures(self, file_name: str):
+        try:
+            with open(file_name, "r") as file:
+                data = file.readlines()
+                data_cleared = [item.strip() for item in data]
+                return data_cleared
+        except FileNotFoundError:
             print(f"{file_name} not found!")
 
     def __repr__(self):
@@ -95,15 +104,6 @@ class NumbersInt(Numbers):
     def get_random_number(self):
         return random.randint(1, self.range_numbers)
 
-    def get_failures(self, file_name: str):
-        try:
-            with open(file_name, "r") as file:
-                data = file.readlines()
-                data_cleared = [item.strip() for item in data]
-                return data_cleared
-        except FileNotFoundError:
-            print(f"{file_name} not found!")
-
     def __repr__(self):
         return (
             f"name = {self.name}, number_of_questions = {self.number_of_questions}, range_numbers = {self.range_numbers}")
@@ -118,15 +118,6 @@ class NumbersFloat(Numbers):
 
     def get_random_number(self):
         return round(random.uniform(1.0, float(self.range_numbers)), 1)
-
-    def get_failures(self, file_name: str):
-        try:
-            with open(file_name, "r") as file:
-                data = file.readlines()
-                data_cleared = [item.strip() for item in data]
-                return data_cleared
-        except FileNotFoundError:
-            print(f"{file_name} not found!")
 
     def __repr__(self):
         return (
