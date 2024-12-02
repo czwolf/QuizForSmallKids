@@ -22,8 +22,8 @@
         {%endif%}
 
         {%if request.args.get("run") == "False" %}
-            <a href="{{ url_for('letters', run=False, answer='Correct', delFile = False, end = False) }}" class="btn btn-success text-white">Správně</a>
-            <a href="{{ url_for('letters', run=False, answer='Fail',delFile = False, end = False) }}" class="btn btn-danger text-white">Špatně</a>
+            <a href="{{ url_for('letters', run=False, answer='Correct', delFile = False, end = False, letter = letter) }}" class="btn btn-success text-white">Správně</a>
+            <a href="{{ url_for('letters', run=False, answer='Fail',delFile = False, end = False, letter = letter) }}" class="btn btn-danger text-white">Špatně</a>
             <a href="{{ url_for('letters', run=False, delFile = False, end = True) }}" class="btn btn-warning text-white">Ukončit kvíz</a>
         {% endif %}
     {% endif %}
@@ -46,7 +46,7 @@
                     <td>{{ percentage_correct | round(1) }}%</td>
                     <td>{{ percentage_failed | round(1) }}%</td>
                 </tr>
-                {% if answer_correct or answe_failed %}
+                {% if answer_correct or answer_failed %}
                 <tr>
                     <td>
                         {% for i in range(answer_correct) %}
@@ -62,7 +62,7 @@
                 </tr>
                 {% endif %}
 
-                {% if failures and not (failures|length == 1 and failures[0] == 'X') and not (failures == ['X'] * failures|length) %}
+                {% if failures %}
                 <tr>
                     <td></td>
                     <td>

@@ -9,58 +9,103 @@ from abc import ABC, abstractmethod
 # musí mít počet otázek - nastavit default
 # musí mít obtížnost
 
+class Storage(ABC):
+    @abstractmethod
+    def save_answer(self):
+        pass
+
+    def delete(self):
+        pass
+    
+class FileSystem(Storage):
+    def __init__(self, file_path: str, i: str, answer: str, correctness: bool):
+        self.file_path = file_path
+        self.answer = answer
+        self.correctness = correctness
+        self.i = i
+    def save_answer(self):
+
+        correctness = 1 if self.correctness else 0
+
+        try:
+            with open(self.file_path, "a+") as file:
+                if not self.i:
+                    file.write(f"1;{correctness};{self.answer}\n")
+                else:
+                    file.write(f"{int(self.i) + 1};{correctness};{self.answer}\n")
+        except FileNotFoundError:
+            print(f"{self.file_path} not found!")
+
+
+    def delete(self):
+        try:
+            os.remove(self.file_path)
+        except FileNotFoundError:
+            print(f"{self.file_path} not found!")
+            
+
+class DataManager(Storage):
+    def __init__(self, storage: Storage):
+        self.storage = storage
+            
+    def save_answer(self):
+        self.storage.save_answer()
+
+    def delete(self):
+        self.storage.delete()
+
 class Quiz:
     """
     Base class for all Quiz.
     """
 
-    def __init__(self, name: str, file_name: str, number_of_questions: int = None, difficult: int = 1):
+    def __init__(self, name: str, file_path: str, number_of_questions: int = None, difficult: int = 1):
         self.name = name
-        self.file_name = file_name
+        self.file_path = file_path
         self.number_of_questions = number_of_questions
         self.difficult = difficult
 
-    def remove_file(self, file_name):
+    def remove_file(self, file_path):
         try:
-            os.remove(file_name)
+            os.remove(file_path)
         except FileNotFoundError:
-            print(f"{file_name} not found!")
+            print(f"{file_path} not found!")
 
-    def set_counter(self, file_name: str):
+    def set_counter(self, file_path: str):
         try:
-            with open(file_name, "r") as file:
+            with open(file_path, "r") as file:
                 lines = file.readlines()
                 return len(lines)
         except FileNotFoundError:
-            print(f"{file_name} not found!")
+            print(f"{file_path} not found!")
 
-    def set_correct_answer(self, file_name: str, i: str):
+    def set_correct_answer(self, file_path: str, i: str):
         try:
-            with open(file_name, "a+") as file:
+            with open(file_path, "a+") as file:
                 if not i:
                     file.write("1;1;X\n")
                 else:
                     file.write(f"{int(i) + 1};1;X\n")
         except FileNotFoundError:
-            print(f"{file_name} not found!")
+            print(f"{file_path} not found!")
 
-    def set_wrong_answer(self, file_name: str, i: str, answer: str):
+    def set_wrong_answer(self, file_path: str, i: str, answer: str):
         try:
-            with open(file_name, "a+") as file:
+            with open(file_path, "a+") as file:
                 if not i:
                     file.write(f"1;0;{answer}\n")
                 else:
                     file.write(f"{int(i) + 1};0;{answer}\n")
         except FileNotFoundError:
-            print(f"{file_name} not found!")
+            print(f"{file_path} not found!")
 
     @abstractmethod
-    def get_failures(self, file_name: str):
+    def get_failures(self, file_path: str):
         pass
 
     def __repr__(self):
         return (
-            f"name = {self.name}, file_name = {self.file_name}, number_of_questions = {self.number_of_questions}, difficult = {self.difficult}")
+            f"name = {self.name}, file_path = {self.file_path}, number_of_questions = {self.number_of_questions}, difficult = {self.difficult}")
 
 
 class Numbers(Quiz, ABC):
@@ -80,14 +125,14 @@ class Numbers(Quiz, ABC):
         except FileNotFoundError:
             print(f"{filename} not found!")
 
-    def get_failures(self, file_name: str):
+    def get_failures(self, file_path: str):
         try:
-            with open(file_name, "r") as file:
+            with open(file_path, "r") as file:
                 data = file.readlines()
                 data_cleared = [item.strip() for item in data]
                 return data_cleared
         except FileNotFoundError:
-            print(f"{file_name} not found!")
+            print(f"{file_path} not found!")
 
     def __repr__(self):
         return (
@@ -128,6 +173,22 @@ class Letters(Quiz):
     def __init__(self, name: str = "Letters", number_of_questions: int = None):
         super().__init__(name, number_of_questions)
 
+    def save_wrong_answer_letter(self, file_path: str, number: str):
+        try:
+            file = open(file_path, "a+")
+            file.write(str(number) + "\n")
+        except FileNotFoundError:
+            print(f"{file_path} not found!")
+
+    def get_failures(self, file_path: str):
+        try:
+            with open(file_path, "r") as file:
+                data = file.readlines()
+                data_cleared = [item.strip() for item in data]
+                return data_cleared
+        except FileNotFoundError:
+            print(f"{file_path} not found!")
+
     def get_random_letter(self):
         return random.choice(string.ascii_uppercase)
 
@@ -138,40 +199,40 @@ class Letters(Quiz):
 
 class Quiz2:
     @staticmethod
-    def remove_file(file_name: str):
-        if os.path.exists(file_name):
-            os.remove(file_name)
+    def remove_file(file_path: str):
+        if os.path.exists(file_path):
+            os.remove(file_path)
 
     @staticmethod
-    def set_counter(file_name: str):
-        with open(file_name, "r") as file:
+    def set_counter(file_path: str):
+        with open(file_path, "r") as file:
             lines = file.readlines()
             return len(lines)
 
     @staticmethod
-    def set_correct_answer(file_name: str, i: str):
-        with open(file_name, "a+") as file:
+    def set_correct_answer(file_path: str, i: str):
+        with open(file_path, "a+") as file:
             if not i:
                 file.write("1;1;X\n")
             else:
                 file.write(f"{int(i) + 1};1;X\n")
 
     @staticmethod
-    def set_fail_answer(file_name: str, i: str, answer: str):
-        with open(file_name, "a+") as file:
+    def set_fail_answer(file_path: str, i: str, answer: str):
+        with open(file_path, "a+") as file:
             if not i:
                 file.write(f"1;0;{answer}\n")
             else:
                 file.write(f"{int(i) + 1};0;{answer}\n")
 
     @staticmethod
-    def failures(file_name: str):
-        df = pd.read_csv(file_name, sep=";", names=["num", "answer", "items"], encoding="windows-1250")
+    def failures(file_path: str):
+        df = pd.read_csv(file_path, sep=";", names=["num", "answer", "items"], encoding="windows-1250")
         return df["items"].to_list()
 
     @staticmethod
-    def set_temp(file_name: str, key: str, answer: str):
-        with open(file_name, "a+", encoding="utf-8") as file:
+    def set_temp(file_path: str, key: str, answer: str):
+        with open(file_path, "a+", encoding="utf-8") as file:
             file.write(f"{key};{answer}\n")
             file.close()
 

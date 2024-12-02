@@ -3,7 +3,7 @@ from flask import Flask, render_template, request, redirect, url_for, session
 import string
 import os
 import pandas as pd
-from quiz import Quiz2 as q, Quiz, Numbers, NumbersInt, NumbersFloat, Letters
+from quiz import Quiz2 as q, Quiz, Numbers, NumbersInt, NumbersFloat, Letters, FileSystem, Storage, DataManager
 
 app = Flask(__name__)
 secret_key = os.urandom(10)
@@ -17,7 +17,6 @@ def home():
 
 @app.route("/numbers", methods=["POST", "GET"])
 def numbers():
-
     all_answers = "answered_numbers.csv"
     template_name = "number.html"
     wrong_answered_number = "wrong_answered_numbers.csv"
@@ -90,48 +89,64 @@ def numbers():
 
 @app.route("/letters")
 def letters():
-    file_name = "letters.csv"
+    all_answers = "answered_letters.csv"
     template_name = "letter.html"
+    wrong_answered_letter = "wrong_answered_letters.csv"
     end = False
-    answer_correct = 0
-    answer_failed = 0
+    answer_correct = ""
+    answer_failed = ""
     percentage_correct = 0
     percentage_failed = 0
+    correctness = None
     failures = []
-
-    quiz_letters = Letters()
-
-    letter = quiz_letters.get_random_letter()
-    letter_lower = letter.lower()
 
     if request.args.get("run") == "True":
         return render_template(template_name)
-    else:
-        if request.args.get("delFile") == "True":
-            quiz_letters.remove_file(file_name)
 
-        if os.path.exists(file_name):
-            i = quiz_letters.set_counter(file_name)
+    else:
+        quiz_letters = Letters()
+        random_letter = quiz_letters.get_random_letter()
+
+        if request.args.get("delFile") == "True":
+            quiz_letters.remove_file(all_answers)
+            quiz_letters.remove_file(wrong_answered_letter)
+
+        if os.path.exists(all_answers):
+            i = quiz_letters.set_counter(all_answers)
         else:
             i = 0
 
         if request.args.get("answer") == "Correct":
-            quiz_letters.set_correct_answer(file_name, i)
+            correctness = True
 
         if request.args.get("answer") == "Fail":
-            quiz_letters.set_fail_answer(file_name, i, str(letter))
+            correctness = False
+            quiz_letters.save_wrong_answer_letter(wrong_answered_letter, request.args.get("letter"))
+
+        if correctness is not None:
+            storage = FileSystem(all_answers, i=i, answer=request.args.get("letter"), correctness=correctness)
+            data_manager = DataManager(storage=storage)
+            data_manager.save_answer()
 
         if request.args.get("end") == "True":
             end = True
-            df = pd.read_csv(file_name, sep=";", names=["num", "answer", "item"])
-            num_of_questions = len(df)
-            answer_correct = df["answer"].sum()
-            answer_failed = num_of_questions - answer_correct
-            percentage_correct = (answer_correct / num_of_questions) * 100
-            percentage_failed = (answer_failed / num_of_questions) * 100
-            failures = quiz_letters.failures(file_name)
 
-        return render_template(template_name, failures=failures, letter=letter,letter_lower=letter_lower, end=end,
+            if os.path.exists(all_answers):
+                df = pd.read_csv(all_answers, sep=";", names=["num", "answer", "item"])
+                num_of_questions = len(df)
+                answer_correct = df["answer"].sum()
+                answer_failed = num_of_questions - answer_correct
+                percentage_correct = (answer_correct / num_of_questions) * 100
+                percentage_failed = (answer_failed / num_of_questions) * 100
+                try:
+                    failures = quiz_letters.get_failures(wrong_answered_letter)
+                    print(failures)
+                except FileNotFoundError:
+                    pass
+            else:
+                pass
+
+        return render_template(template_name, failures=failures, letter=random_letter, end=end,
                                answer_correct=answer_correct, answer_failed=answer_failed,
                                percentage_correct=percentage_correct, percentage_failed=percentage_failed)
 
