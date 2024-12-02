@@ -18,7 +18,7 @@ class Storage(ABC):
         pass
     
 class FileSystem(Storage):
-    def __init__(self, file_path: str, i: str, answer: str, correctness: bool):
+    def __init__(self, file_path: str, answer: str = None, correctness: bool = None, i: str = None):
         self.file_path = file_path
         self.answer = answer
         self.correctness = correctness
@@ -35,7 +35,6 @@ class FileSystem(Storage):
                     file.write(f"{int(self.i) + 1};{correctness};{self.answer}\n")
         except FileNotFoundError:
             print(f"{self.file_path} not found!")
-
 
     def delete(self):
         try:
@@ -173,19 +172,12 @@ class Letters(Quiz):
     def __init__(self, name: str = "Letters", number_of_questions: int = None):
         super().__init__(name, number_of_questions)
 
-    def save_wrong_answer_letter(self, file_path: str, number: str):
-        try:
-            file = open(file_path, "a+")
-            file.write(str(number) + "\n")
-        except FileNotFoundError:
-            print(f"{file_path} not found!")
-
     def get_failures(self, file_path: str):
         try:
-            with open(file_path, "r") as file:
-                data = file.readlines()
-                data_cleared = [item.strip() for item in data]
-                return data_cleared
+            df = pd.read_csv("answered_letters.csv", sep=";", names=["num", "answer", "item"])
+            failures = df.loc[df["answer"] == 0]
+            return failures["item"].to_list()
+
         except FileNotFoundError:
             print(f"{file_path} not found!")
 
@@ -195,6 +187,34 @@ class Letters(Quiz):
     def __repr__(self):
         return (
             f"name = {self.name}, number_of_questions = {self.number_of_questions}")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 class Quiz2:

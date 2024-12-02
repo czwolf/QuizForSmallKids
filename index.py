@@ -108,8 +108,9 @@ def letters():
         random_letter = quiz_letters.get_random_letter()
 
         if request.args.get("delFile") == "True":
-            quiz_letters.remove_file(all_answers)
-            quiz_letters.remove_file(wrong_answered_letter)
+            delete_file = FileSystem(file_path=all_answers)
+            data_manager = DataManager(storage=delete_file)
+            data_manager.delete()
 
         if os.path.exists(all_answers):
             i = quiz_letters.set_counter(all_answers)
@@ -121,7 +122,6 @@ def letters():
 
         if request.args.get("answer") == "Fail":
             correctness = False
-            quiz_letters.save_wrong_answer_letter(wrong_answered_letter, request.args.get("letter"))
 
         if correctness is not None:
             storage = FileSystem(all_answers, i=i, answer=request.args.get("letter"), correctness=correctness)
