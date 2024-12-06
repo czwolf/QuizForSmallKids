@@ -97,7 +97,6 @@ def letters():
     percentage_correct = 0
     percentage_failed = 0
     correctness = None
-    storage_file_system = None
     quiz_name = "Letters_quiz"
     failures = []
 
