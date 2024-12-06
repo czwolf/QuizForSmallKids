@@ -71,6 +71,51 @@ class DataManager(Storage):
     def delete(self):
         return self.storage.delete()
 
+class Storage(ABC):
+    @abstractmethod
+    def save_correct_answers(self):
+        pass
+
+    @abstractmethod
+    def save_wrong_answer(self):
+        pass
+
+class FileSaver(Storage):
+    def __init__(self, file_name: str, i: str, answer: str = "X"):
+        self.file_name = file_name
+        self.answer = answer
+        self.i = i
+    def save_correct_answers(self):
+        try:
+            with open(self.file_name, "a+") as file:
+                if not self.i:
+                    file.write(f"1;1;{self.answer}\n")
+                else:
+                    file.write(f"{int(self.i) + 1};1;{self.answer}\n")
+        except FileNotFoundError:
+            print(f"{self.file_name} not found!")
+
+    def set_wrong_answer(self):
+        try:
+            with open(self.file_name, "a+") as file:
+                if not self.i:
+                    file.write(f"1;0;{self.answer}\n")
+                else:
+                    file.write(f"{int(self.i) + 1};0;{self.answer}\n")
+        except FileNotFoundError:
+            print(f"{self.file_name} not found!")
+
+class  DataProcessor(Storage):
+    def __init__(self, storage: Storage):
+        self.storage = storage
+
+    def save_correct_answers(self):
+        self.storage.save_correct_answers()
+
+    def save_wrong_answer(self):
+        self.storage.save_wrong_answer()
+
+
 class Quiz:
     """
     Base class for all Quiz.

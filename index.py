@@ -19,14 +19,17 @@ def home():
 def numbers():
     all_answers = "answered_numbers.csv"
     template_name = "number.html"
-    wrong_answered_number = "wrong_answered_numbers.csv"
     end = False
     answer_correct = 0
     answer_failed = 0
     percentage_correct = 0
     percentage_failed = 0
+    correctness = None
     failures = []
     numbers_type = session.get("numbers_type")
+
+    file_storage = FileSystem(all_answers)
+    data_manager = DataManager(storage=file_storage)
 
     if request.method == "POST":
         if request.form.get("numbers_type"):
@@ -38,15 +41,16 @@ def numbers():
 
     else:
         if numbers_type == "int":
+            quiz_name = "Numbers_quiz_int"
             quiz_numbers = NumbersInt()
             random_number = quiz_numbers.get_random_number()
         else:
+            quiz_name = "Numbers_quiz_float"
             quiz_numbers = NumbersFloat()
             random_number = quiz_numbers.get_random_number()
 
         if request.args.get("delFile") == "True":
-            quiz_numbers.remove_file(all_answers)
-            quiz_numbers.remove_file(wrong_answered_number)
+            data_manager.delete()
 
         if os.path.exists(all_answers):
             i = quiz_numbers.set_counter(all_answers)
@@ -54,11 +58,16 @@ def numbers():
             i = 0
 
         if request.args.get("answer") == "Correct":
-            quiz_numbers.set_correct_answer(all_answers, i)
+            correctness = True
 
-        if request.args.get("answer") == "Fail" and request.args.get("number"):
-            quiz_numbers.set_wrong_answer(all_answers, i, str(random_number))
-            quiz_numbers.save_wrong_answer_number(wrong_answered_number, request.args.get("number"))
+        if request.args.get("answer") == "Fail":
+            correctness = False
+
+        if correctness is not None:
+            data_manager.save_answer(correctness=correctness,
+                                     answer=request.args.get("number"),
+                                     quiz_name=quiz_name,
+                                     i=i)
 
         if request.args.get("end") == "True":
             end = True
@@ -69,22 +78,27 @@ def numbers():
                 pass
 
             if os.path.exists(all_answers):
-                df = pd.read_csv(all_answers, sep=";", names=["num", "answer", "item"])
+                df = pd.read_csv(all_answers, sep=";", names=["quiz_name", "num", "correctness", "item"])
                 num_of_questions = len(df)
-                answer_correct = df["answer"].sum()
+                answer_correct = df["correctness"].sum()
                 answer_failed = num_of_questions - answer_correct
                 percentage_correct = (answer_correct / num_of_questions) * 100
                 percentage_failed = (answer_failed / num_of_questions) * 100
                 try:
-                    failures = quiz_numbers.get_failures(wrong_answered_number)
+                    failures = data_manager.get_failures_basic()
                 except FileNotFoundError:
                     pass
             else:
                 pass
 
-        return render_template(template_name, failures=failures, number=random_number, end=end,
-                               answer_correct=answer_correct, answer_failed=answer_failed,
-                               percentage_correct=percentage_correct, percentage_failed=percentage_failed)
+        return render_template(template_name,
+                               failures=failures,
+                               number=random_number,
+                               end=end,
+                               answer_correct=answer_correct,
+                               answer_failed=answer_failed,
+                               percentage_correct=percentage_correct,
+                               percentage_failed=percentage_failed)
 
 
 @app.route("/letters")
