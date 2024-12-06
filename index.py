@@ -91,14 +91,19 @@ def numbers():
 def letters():
     all_answers = "answered_letters.csv"
     template_name = "letter.html"
-    wrong_answered_letter = "wrong_answered_letters.csv"
     end = False
     answer_correct = ""
     answer_failed = ""
     percentage_correct = 0
     percentage_failed = 0
     correctness = None
+    storage_file_system = None
+    quiz_name = "Letters_quiz"
     failures = []
+
+    storage = FileSystem(all_answers)
+    data_manager = DataManager(storage=storage)
+
 
     if request.args.get("run") == "True":
         return render_template(template_name)
@@ -108,8 +113,6 @@ def letters():
         random_letter = quiz_letters.get_random_letter()
 
         if request.args.get("delFile") == "True":
-            delete_file = FileSystem(file_path=all_answers)
-            data_manager = DataManager(storage=delete_file)
             data_manager.delete()
 
         if os.path.exists(all_answers):
@@ -124,31 +127,36 @@ def letters():
             correctness = False
 
         if correctness is not None:
-            storage = FileSystem(all_answers, i=i, answer=request.args.get("letter"), correctness=correctness)
-            data_manager = DataManager(storage=storage)
-            data_manager.save_answer()
+            data_manager.save_answer(correctness=correctness,
+                                     answer=request.args.get("letter"),
+                                     quiz_name=quiz_name,
+                                     i=i)
 
         if request.args.get("end") == "True":
             end = True
 
             if os.path.exists(all_answers):
-                df = pd.read_csv(all_answers, sep=";", names=["num", "answer", "item"])
+                df = pd.read_csv(all_answers, sep=";", names=["quiz_name", "num", "correctness", "item"])
                 num_of_questions = len(df)
-                answer_correct = df["answer"].sum()
+                answer_correct = df["correctness"].sum()
                 answer_failed = num_of_questions - answer_correct
                 percentage_correct = (answer_correct / num_of_questions) * 100
                 percentage_failed = (answer_failed / num_of_questions) * 100
                 try:
-                    failures = quiz_letters.get_failures(wrong_answered_letter)
-                    print(failures)
+                    failures = data_manager.get_failures_basic()
                 except FileNotFoundError:
                     pass
             else:
                 pass
 
-        return render_template(template_name, failures=failures, letter=random_letter, end=end,
-                               answer_correct=answer_correct, answer_failed=answer_failed,
-                               percentage_correct=percentage_correct, percentage_failed=percentage_failed)
+        return render_template(template_name,
+                               failures=failures,
+                               letter=random_letter,
+                               end=end,
+                               answer_correct=answer_correct,
+                               answer_failed=answer_failed,
+                               percentage_correct=percentage_correct,
+                               percentage_failed=percentage_failed)
 
 
 @app.route("/words")

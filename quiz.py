@@ -5,34 +5,41 @@ import string
 from abc import ABC, abstractmethod
 
 
-# musí mít jméno
-# musí mít počet otázek - nastavit default
-# musí mít obtížnost
-
 class Storage(ABC):
     @abstractmethod
-    def save_answer(self):
+    def save_answer(self, correctness, answer, quiz_name, i):
         pass
 
+    @abstractmethod
+    def get_failures_basic(self):
+        pass
+
+    @abstractmethod
     def delete(self):
         pass
     
 class FileSystem(Storage):
-    def __init__(self, file_path: str, answer: str = None, correctness: bool = None, i: str = None):
+    def __init__(self, file_path: str):
         self.file_path = file_path
-        self.answer = answer
-        self.correctness = correctness
-        self.i = i
-    def save_answer(self):
 
-        correctness = 1 if self.correctness else 0
+    def save_answer(self, correctness: bool, answer: str = None, quiz_name: str = None, i: int = None):
+        correctness = 1 if correctness else 0
 
         try:
             with open(self.file_path, "a+") as file:
-                if not self.i:
-                    file.write(f"1;{correctness};{self.answer}\n")
+                if not i:
+                    file.write(f"{quiz_name};1;{correctness};{answer}\n")
                 else:
-                    file.write(f"{int(self.i) + 1};{correctness};{self.answer}\n")
+                    file.write(f"{quiz_name};{int(i) + 1};{correctness};{answer}\n")
+        except FileNotFoundError:
+            print(f"{self.file_path} not found!")
+
+    def get_failures_basic(self):
+        try:
+            df = pd.read_csv(self.file_path, sep=";", names=["quiz_name", "num", "correctness", "item"])
+            failures = df.loc[df["correctness"] == 0]
+            return failures["item"].to_list()
+
         except FileNotFoundError:
             print(f"{self.file_path} not found!")
 
@@ -46,12 +53,23 @@ class FileSystem(Storage):
 class DataManager(Storage):
     def __init__(self, storage: Storage):
         self.storage = storage
-            
-    def save_answer(self):
-        self.storage.save_answer()
+
+    def save_answer(self, correctness: bool, answer: str = None, quiz_name: str = None, i: int = None):
+        """
+        Save data to the storage.
+
+        :param quiz_name: name of the quiz
+        :param answer: Users answer
+        :param i: index (number) of question
+        :param correctness: True or False
+        """
+        return self.storage.save_answer(correctness, answer, quiz_name, i)
+
+    def get_failures_basic(self):
+        return self.storage.get_failures_basic()
 
     def delete(self):
-        self.storage.delete()
+        return self.storage.delete()
 
 class Quiz:
     """
