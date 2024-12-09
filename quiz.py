@@ -36,9 +36,16 @@ class FileSystem(Storage):
 
     def get_failures_basic(self):
         try:
-            df = pd.read_csv(self.file_path, sep=";", names=["quiz_name", "num", "correctness", "item"])
-            failures = df.loc[df["correctness"] == 0]
-            return failures["item"].to_list()
+            with open(self.file_path, "r", encoding='utf-8') as file:
+                data = file.readlines()
+                data_cleared = [i.strip() for i in data]
+                data_splited = [i.split(";") for i in data_cleared]
+                failures = []
+                for values in data_splited:
+                    for value in values[2]:
+                        if int(value) == 0:
+                            failures.append(values[3])
+                return failures
 
         except FileNotFoundError:
             print(f"{self.file_path} not found!")
