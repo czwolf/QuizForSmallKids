@@ -38,8 +38,8 @@ class FileSystem(Storage):
         try:
             with open(self.file_path, "r", encoding='utf-8') as file:
                 data = file.readlines()
-                data_cleared = [i.strip() for i in data]
-                data_splited = [i.split(";") for i in data_cleared]
+                data_striped = [i.strip() for i in data]
+                data_splited = [i.split(";") for i in data_striped]
                 failures = []
                 for values in data_splited:
                     for value in values[2]:
