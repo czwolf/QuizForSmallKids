@@ -26,7 +26,7 @@ class FileSystem(Storage):
         correctness = 1 if correctness else 0
 
         try:
-            with open(self.file_path, "a+") as file:
+            with open(self.file_path, "a+", encoding='utf-8') as file:
                 if not i:
                     file.write(f"{quiz_name};1;{correctness};{answer}\n")
                 else:
@@ -36,7 +36,7 @@ class FileSystem(Storage):
 
     def get_failures_basic(self):
         try:
-            with open(self.file_path, "r", encoding='cp1250') as file:
+            with open(self.file_path, "r", encoding='utf-8') as file:
                 data = [row.strip().split(";") for row in file]
                 failures = [row[3] for row in data if row[2] == '0']
                 return failures
