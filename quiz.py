@@ -37,14 +37,8 @@ class FileSystem(Storage):
     def get_failures_basic(self):
         try:
             with open(self.file_path, "r", encoding='utf-8') as file:
-                data = file.readlines()
-                data_striped = [i.strip() for i in data]
-                data_splited = [i.split(";") for i in data_striped]
-                failures = []
-                for values in data_splited:
-                    for value in values[2]:
-                        if int(value) == 0:
-                            failures.append(values[3])
+                data = [row.strip().split(";") for row in file]
+                failures = [row[3] for row in data if row[2] == '0']
                 return failures
 
         except FileNotFoundError:
