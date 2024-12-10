@@ -36,7 +36,7 @@ class FileSystem(Storage):
 
     def get_failures_basic(self):
         try:
-            with open(self.file_path, "r", encoding='utf-8') as file:
+            with open(self.file_path, "r", encoding='cp1250') as file:
                 data = [row.strip().split(";") for row in file]
                 failures = [row[3] for row in data if row[2] == '0']
                 return failures
@@ -137,22 +137,6 @@ class Numbers(Quiz, ABC):
         super().__init__(name, number_of_questions)
         self.range_numbers = range_numbers
 
-    def save_wrong_answer_number(self, filename: str, number: str):
-        try:
-            file = open(filename, "a+")
-            file.write(str(number) + "\n")
-        except FileNotFoundError:
-            print(f"{filename} not found!")
-
-    def get_failures(self, file_path: str):
-        try:
-            with open(file_path, "r") as file:
-                data = file.readlines()
-                data_cleared = [item.strip() for item in data]
-                return data_cleared
-        except FileNotFoundError:
-            print(f"{file_path} not found!")
-
     def __repr__(self):
         return (
             f"name = {self.name}, number_of_questions = {self.number_of_questions}, range_numbers = {self.range_numbers}")
@@ -192,15 +176,6 @@ class Letters(Quiz):
     def __init__(self, name: str = "Letters", number_of_questions: int = None):
         super().__init__(name, number_of_questions)
 
-    def get_failures(self, file_path: str):
-        try:
-            df = pd.read_csv("answered_letters.csv", sep=";", names=["num", "answer", "item"])
-            failures = df.loc[df["answer"] == 0]
-            return failures["item"].to_list()
-
-        except FileNotFoundError:
-            print(f"{file_path} not found!")
-
     def get_random_letter(self):
         return random.choice(string.ascii_uppercase)
 
@@ -208,6 +183,17 @@ class Letters(Quiz):
         return (
             f"name = {self.name}, number_of_questions = {self.number_of_questions}")
 
+class Words(Quiz):
+    def __init__(self, name: str = "Words", words_list: list = None, number_of_questions: int = None):
+        super().__init__(name, words_list, number_of_questions)
+        self.word_list = words_list
+
+    def get_random_word(self):
+        return random.choice(self.word_list)
+
+    def __repr__(self):
+        return (
+            f"name = {self.name}, number_of_questions = {self.number_of_questions}")
 
 
 

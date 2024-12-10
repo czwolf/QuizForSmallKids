@@ -3,7 +3,7 @@ from flask import Flask, render_template, request, redirect, url_for, session
 import string
 import os
 import pandas as pd
-from quiz import Quiz2 as q, Quiz, Numbers, NumbersInt, NumbersFloat, Letters, FileSystem, Storage, DataManager
+from quiz import Quiz2 as q, Quiz, Numbers, NumbersInt, NumbersFloat, Letters, FileSystem, Storage, DataManager, Words
 
 app = Flask(__name__)
 secret_key = os.urandom(10)
@@ -174,7 +174,7 @@ def letters():
 
 @app.route("/words")
 def words():
-    names_list = [
+    words_list = [
         "Dům", "Kočka", "Pes", "Stůl", "Kresba", "Auto", "Hračka", "Jablko", "Klíč", "Kniha",
         "Hora", "Strom", "Míč", "Květina", "Okno", "Hlava", "Ruka", "Noha", "Obraz", "Kluk",
         "Holka", "Dítě", "Rybka", "Lampa", "Měsíc", "Slunce", "Zahrada", "Obloha", "Lístek",
@@ -186,49 +186,76 @@ def words():
         "Zrcadlo", "Postýlka", "Pták", "Lev", "Sova", "Pavučina", "Zvon", "Klavír", "Přítel",
         "Zahrádka", "Košík", "Pomoc", "Zvonek", "Cihla", "Hračky", "Čepice", "Třešeň"
     ]
-    word = random.choice(names_list)
+    # word = random.choice(names_list)
 
-    file_name = "words.csv"
+    all_answers = "answered_words.csv"
     template_name = "word.html"
-    letter = random.choice(string.ascii_uppercase)
-    letter_lower = letter.lower()
     end = False
-    answer_correct = 0
-    answer_failed = 0
+    answer_correct = ""
+    answer_failed = ""
     percentage_correct = 0
     percentage_failed = 0
+    correctness = None
+    quiz_name = "Words_quiz"
     failures = []
+
+    storage = FileSystem(all_answers)
+    data_manager = DataManager(storage=storage)
 
     if request.args.get("run") == "True":
         return render_template(template_name)
-    else:
-        if request.args.get("delFile") == "True":
-            q.remove_file(file_name)
 
-        if os.path.exists(file_name):
-            i = q.set_counter(file_name)
+    else:
+        quiz_words = Words(words_list=words_list)
+        random_word = quiz_words.get_random_word()
+
+        if request.args.get("delFile") == "True":
+            data_manager.delete()
+
+        if os.path.exists(all_answers):
+            i = quiz_words.set_counter(all_answers)
         else:
             i = 0
 
         if request.args.get("answer") == "Correct":
-            q.set_correct_answer(file_name, i)
+            correctness = True
 
         if request.args.get("answer") == "Fail":
-            q.set_fail_answer(file_name, i, str(word))
+            correctness = False
+
+        if correctness is not None:
+            data_manager.save_answer(correctness=correctness,
+                                     answer=request.args.get("word"),
+                                     quiz_name=quiz_name,
+                                     i=i)
 
         if request.args.get("end") == "True":
             end = True
-            df = pd.read_csv(file_name, sep=";", names=["num", "answer", "item"], encoding="windows-1250")
-            num_of_questions = len(df)
-            answer_correct = df["answer"].sum()
-            answer_failed = num_of_questions - answer_correct
-            percentage_correct = (answer_correct / num_of_questions) * 100
-            percentage_failed = (answer_failed / num_of_questions) * 100
-            failures = q.failures(file_name)
 
-        return render_template(template_name, failures=failures, word=word, letter_lower=letter_lower, end=end,
-                               answer_correct=answer_correct, answer_failed=answer_failed,
-                               percentage_correct=percentage_correct, percentage_failed=percentage_failed)
+            if os.path.exists(all_answers):
+                df = pd.read_csv(all_answers, sep=";", names=["quiz_name", "num", "correctness", "item"])
+                num_of_questions = len(df)
+                answer_correct = df["correctness"].sum()
+                answer_failed = num_of_questions - answer_correct
+                percentage_correct = (answer_correct / num_of_questions) * 100
+                percentage_failed = (answer_failed / num_of_questions) * 100
+                try:
+                    failures = data_manager.get_failures_basic()
+                except FileNotFoundError:
+                    pass
+            else:
+                pass
+
+        return render_template(template_name,
+                               failures=failures,
+                               word=random_word,
+                               end=end,
+                               answer_correct=answer_correct,
+                               answer_failed=answer_failed,
+                               percentage_correct=percentage_correct,
+                               percentage_failed=percentage_failed)
+
+
 
 
 @app.route("/questions", methods=["GET", "POST"])
