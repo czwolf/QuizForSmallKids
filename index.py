@@ -42,18 +42,18 @@ def numbers():
     else:
         if numbers_type == "int":
             quiz_name = "Numbers_quiz_int"
-            quiz_numbers = NumbersInt()
+            quiz_numbers = NumbersInt(all_answers)
             random_number = quiz_numbers.get_random_number()
         else:
             quiz_name = "Numbers_quiz_float"
-            quiz_numbers = NumbersFloat()
+            quiz_numbers = NumbersFloat(all_answers)
             random_number = quiz_numbers.get_random_number()
 
         if request.args.get("delFile") == "True":
             data_manager.delete()
 
         if os.path.exists(all_answers):
-            i = quiz_numbers.set_counter(all_answers)
+            i = quiz_numbers.set_counter()
         else:
             i = 0
 
@@ -122,14 +122,14 @@ def letters():
         return render_template(template_name)
 
     else:
-        quiz_letters = Letters()
+        quiz_letters = Letters(all_answers)
         random_letter = quiz_letters.get_random_letter()
 
         if request.args.get("delFile") == "True":
             data_manager.delete()
 
         if os.path.exists(all_answers):
-            i = quiz_letters.set_counter(all_answers)
+            i = quiz_letters.set_counter()
         else:
             i = 0
 
@@ -206,14 +206,14 @@ def words():
         return render_template(template_name)
 
     else:
-        quiz_words = Words(words_list=words_list)
+        quiz_words = Words(file_path=all_answers, words_list=words_list)
         random_word = quiz_words.get_random_word()
 
         if request.args.get("delFile") == "True":
             data_manager.delete()
 
         if os.path.exists(all_answers):
-            i = quiz_words.set_counter(all_answers)
+            i = quiz_words.set_counter()
         else:
             i = 0
 
@@ -254,8 +254,6 @@ def words():
                                answer_failed=answer_failed,
                                percentage_correct=percentage_correct,
                                percentage_failed=percentage_failed)
-
-
 
 
 @app.route("/questions", methods=["GET", "POST"])

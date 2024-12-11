@@ -84,39 +84,13 @@ class Quiz:
         self.number_of_questions = number_of_questions
         self.difficult = difficult
 
-    def remove_file(self, file_path):
+    def set_counter(self):
         try:
-            os.remove(file_path)
-        except FileNotFoundError:
-            print(f"{file_path} not found!")
-
-    def set_counter(self, file_path: str):
-        try:
-            with open(file_path, "r") as file:
+            with open(self.file_path, 'r', encoding='utf-8') as file:
                 lines = file.readlines()
                 return len(lines)
         except FileNotFoundError:
-            print(f"{file_path} not found!")
-
-    def set_correct_answer(self, file_path: str, i: str):
-        try:
-            with open(file_path, "a+") as file:
-                if not i:
-                    file.write("1;1;X\n")
-                else:
-                    file.write(f"{int(i) + 1};1;X\n")
-        except FileNotFoundError:
-            print(f"{file_path} not found!")
-
-    def set_wrong_answer(self, file_path: str, i: str, answer: str):
-        try:
-            with open(file_path, "a+") as file:
-                if not i:
-                    file.write(f"1;0;{answer}\n")
-                else:
-                    file.write(f"{int(i) + 1};0;{answer}\n")
-        except FileNotFoundError:
-            print(f"{file_path} not found!")
+            print(f"{self.file_path} not found!")
 
     @abstractmethod
     def get_failures(self, file_path: str):
@@ -133,59 +107,60 @@ class Numbers(Quiz, ABC):
     :param number_type: int, float
     """
 
-    def __init__(self, name, number_of_questions: int = None, range_numbers: int = 100):
-        super().__init__(name, number_of_questions)
+    def __init__(self, file_path, name, number_of_questions: int = None, range_numbers: int = 100):
+        super().__init__(file_path, name, number_of_questions)
         self.range_numbers = range_numbers
+        self.file_path = file_path
 
     def __repr__(self):
         return (
-            f"name = {self.name}, number_of_questions = {self.number_of_questions}, range_numbers = {self.range_numbers}")
+            f"file_path = {self.file_path}, name = {self.name}, number_of_questions = {self.number_of_questions}, range_numbers = {self.range_numbers}")
 
 
 class NumbersInt(Numbers):
     """
     Quiz with integer numbers
     """
-    def __init__(self, name: str = "NumbersInt", number_of_questions: int = None, range_numbers: int = 100):
-        super().__init__(name, number_of_questions, range_numbers)
+    def __init__(self, file_path, name: str = "NumbersInt", number_of_questions: int = None, range_numbers: int = 100):
+        super().__init__(file_path, name, number_of_questions, range_numbers)
 
     def get_random_number(self):
         return random.randint(1, self.range_numbers)
 
     def __repr__(self):
         return (
-            f"name = {self.name}, number_of_questions = {self.number_of_questions}, range_numbers = {self.range_numbers}")
+            f"file_path = {self.file_path}, name = {self.name}, number_of_questions = {self.number_of_questions}, range_numbers = {self.range_numbers}")
 
 
 class NumbersFloat(Numbers):
     """
     Quiz with float numbers with one decimal number
     """
-    def __init__(self, name: str = "NumbersFloat", number_of_questions: int = None, range_numbers: int = 100):
-        super().__init__(name, number_of_questions, range_numbers)
+    def __init__(self,file_path,  name: str = "NumbersFloat", number_of_questions: int = None, range_numbers: int = 100):
+        super().__init__(file_path, name, number_of_questions, range_numbers)
 
     def get_random_number(self):
         return round(random.uniform(1.0, float(self.range_numbers)), 1)
 
     def __repr__(self):
         return (
-            f"name = {self.name}, number_of_questions = {self.number_of_questions}, range_numbers = {self.range_numbers}")
+            f"file_path = {self.file_path}, name = {self.name}, number_of_questions = {self.number_of_questions}, range_numbers = {self.range_numbers}")
 
 
 class Letters(Quiz):
-    def __init__(self, name: str = "Letters", number_of_questions: int = None):
-        super().__init__(name, number_of_questions)
+    def __init__(self,file_path, name: str = "Letters", number_of_questions: int = None):
+        super().__init__(file_path, name, number_of_questions)
 
     def get_random_letter(self):
         return random.choice(string.ascii_uppercase)
 
     def __repr__(self):
         return (
-            f"name = {self.name}, number_of_questions = {self.number_of_questions}")
+            f"file_path = {self.file_path}, name = {self.name}, number_of_questions = {self.number_of_questions}")
 
 class Words(Quiz):
-    def __init__(self, name: str = "Words", words_list: list = None, number_of_questions: int = None):
-        super().__init__(name, words_list, number_of_questions)
+    def __init__(self,file_path, name: str = "Words", words_list: list = None, number_of_questions: int = None):
+        super().__init__(file_path, name, words_list, number_of_questions)
         self.word_list = words_list
 
     def get_random_word(self):
@@ -193,7 +168,7 @@ class Words(Quiz):
 
     def __repr__(self):
         return (
-            f"name = {self.name}, number_of_questions = {self.number_of_questions}")
+            f"file_path = {self.file_path}, name = {self.name}, number_of_questions = {self.number_of_questions}")
 
 
 
