@@ -92,10 +92,6 @@ class Quiz:
         except FileNotFoundError:
             print(f"{self.file_path} not found!")
 
-    @abstractmethod
-    def get_failures(self, file_path: str):
-        pass
-
     def __repr__(self):
         return (
             f"name = {self.name}, file_path = {self.file_path}, number_of_questions = {self.number_of_questions}, difficult = {self.difficult}")
@@ -114,7 +110,8 @@ class Numbers(Quiz, ABC):
 
     def __repr__(self):
         return (
-            f"file_path = {self.file_path}, name = {self.name}, number_of_questions = {self.number_of_questions}, range_numbers = {self.range_numbers}")
+            f"file_path = {self.file_path}, name = {self.name}, number_of_questions = {self.number_of_questions},"
+            f" range_numbers = {self.range_numbers}")
 
 
 class NumbersInt(Numbers):

@@ -1,9 +1,9 @@
 import random
 from flask import Flask, render_template, request, redirect, url_for, session
-import string
 import os
 import pandas as pd
-from quiz import Quiz2 as q, Quiz, Numbers, NumbersInt, NumbersFloat, Letters, FileSystem, Storage, DataManager, Words
+from quiz import Quiz2 as q, NumbersInt, NumbersFloat, Letters, FileSystem, DataManager, Words
+from static.docs.words_list_reading import words_reading
 
 app = Flask(__name__)
 secret_key = os.urandom(10)
@@ -174,20 +174,7 @@ def letters():
 
 @app.route("/words")
 def words():
-    words_list = [
-        "Dům", "Kočka", "Pes", "Stůl", "Kresba", "Auto", "Hračka", "Jablko", "Klíč", "Kniha",
-        "Hora", "Strom", "Míč", "Květina", "Okno", "Hlava", "Ruka", "Noha", "Obraz", "Kluk",
-        "Holka", "Dítě", "Rybka", "Lampa", "Měsíc", "Slunce", "Zahrada", "Obloha", "Lístek",
-        "Město", "Zvíře", "Loď", "Nůžky", "Škola", "Pero", "Hrad", "Růže", "Motýl", "Srdce",
-        "Zmrzlina", "Koš", "Řeka", "Kolo", "Medvěd", "Zima", "Léto", "Podlaha", "Střecha",
-        "Dveře", "Stín", "Chléb", "Cukr", "Hřebík", "Lžíce", "Stoleček", "Třída", "Mrak",
-        "Vlak", "Ryba", "Lopatka", "Krabice", "Třešeň", "Banán", "Hříbek", "Ořech", "Záhon",
-        "Králík", "Zámek", "Husa", "Krava", "Okurka", "Brambora", "Pomeranč", "Hvězda",
-        "Zrcadlo", "Postýlka", "Pták", "Lev", "Sova", "Pavučina", "Zvon", "Klavír", "Přítel",
-        "Zahrádka", "Košík", "Pomoc", "Zvonek", "Cihla", "Hračky", "Čepice", "Třešeň"
-    ]
-    # word = random.choice(names_list)
-
+    words_list = words_reading
     all_answers = "answered_words.csv"
     template_name = "word.html"
     end = False
