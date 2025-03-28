@@ -133,7 +133,7 @@ class NumbersFloat(Numbers):
     """
     Quiz with float numbers with one decimal number
     """
-    def __init__(self,file_path,  name: str = "NumbersFloat", number_of_questions: int = None, range_numbers: int = 100):
+    def __init__(self, file_path,  name: str = "NumbersFloat", number_of_questions: int = None, range_numbers: int = 100):
         super().__init__(file_path, name, number_of_questions, range_numbers)
 
     def get_random_number(self):
@@ -145,7 +145,7 @@ class NumbersFloat(Numbers):
 
 
 class Letters(Quiz):
-    def __init__(self,file_path, name: str = "Letters", number_of_questions: int = None):
+    def __init__(self, file_path, name: str = "Letters", number_of_questions: int = None):
         super().__init__(file_path, name, number_of_questions)
 
     def get_random_letter(self):
@@ -156,7 +156,7 @@ class Letters(Quiz):
             f"file_path = {self.file_path}, name = {self.name}, number_of_questions = {self.number_of_questions}")
 
 class Words(Quiz):
-    def __init__(self,file_path, name: str = "Words", words_list: list = None, number_of_questions: int = None):
+    def __init__(self, file_path, name: str = "Words", words_list: list = None, number_of_questions: int = None):
         super().__init__(file_path, name, words_list, number_of_questions)
         self.word_list = words_list
 
@@ -168,19 +168,18 @@ class Words(Quiz):
             f"file_path = {self.file_path}, name = {self.name}, number_of_questions = {self.number_of_questions}")
 
 
+class Flags(Quiz):
+    def __init__(self, file_path, name: str = "Flags", flags_list: list = None, number_of_questions: int = None):
+        super().__init__(file_path, name, flags_list, number_of_questions)
+        self.flags_list = flags_list
 
+    def get_random_flag(self):
+        flags_list = os.listdir("static/flags_high_res")
+        return random.choice(flags_list)
 
-
-
-
-
-
-
-
-
-
-
-
+    def __repr__(self):
+        return (
+            f"file_path = {self.file_path}, name = {self.name}, number_of_questions = {self.number_of_questions}")
 
 
 
