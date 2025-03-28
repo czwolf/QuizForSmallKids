@@ -2,7 +2,7 @@ import random
 from flask import Flask, render_template, request, redirect, url_for, session
 import os
 import pandas as pd
-from quiz import Quiz2 as q, NumbersInt, NumbersFloat, Letters, FileSystem, DataManager, Words
+from quiz import Quiz2 as q, NumbersInt, NumbersFloat, Letters, FileSystem, DataManager, Words, Flags
 from static.docs.words_list_reading import words_reading
 
 app = Flask(__name__)
@@ -315,6 +315,76 @@ def questions():
         return render_template(template_name, failures=failures, random_key=random_key, end=end,
                                random_value=random_value, answer_correct=answer_correct,
                                answer_failed=answer_failed, percentage_correct=percentage_correct,
+                               percentage_failed=percentage_failed)
+
+
+@app.route("/flags")
+def flags():
+    all_answers = "answered_flags.csv"
+    template_name = "flag.html"
+    end = False
+    answer_correct = ""
+    answer_failed = ""
+    percentage_correct = 0
+    percentage_failed = 0
+    correctness = None
+    quiz_name = "Flags_quiz"
+    failures = []
+
+    storage = FileSystem(all_answers)
+    data_manager = DataManager(storage=storage)
+
+    if request.args.get("run") == "True":
+        return render_template(template_name)
+
+    else:
+        quiz_flags = Flags(file_path=all_answers)
+        random_flag = quiz_flags.get_random_flag()
+
+        if request.args.get("delFile") == "True":
+            data_manager.delete()
+
+        if os.path.exists(all_answers):
+            i = quiz_flags.set_counter()
+        else:
+            i = 0
+
+        if request.args.get("answer") == "Correct":
+            correctness = True
+
+        if request.args.get("answer") == "Fail":
+            correctness = False
+
+        if correctness is not None:
+            data_manager.save_answer(correctness=correctness,
+                                     answer=request.args.get("flag"),
+                                     quiz_name=quiz_name,
+                                     i=i)
+
+        if request.args.get("end") == "True":
+            end = True
+
+            if os.path.exists(all_answers):
+                df = pd.read_csv(all_answers, sep=";", names=["quiz_name", "num", "correctness", "item"])
+                num_of_questions = len(df)
+                answer_correct = df["correctness"].sum()
+                answer_failed = num_of_questions - answer_correct
+                percentage_correct = (answer_correct / num_of_questions) * 100
+                percentage_failed = (answer_failed / num_of_questions) * 100
+                try:
+                    failures = data_manager.get_failures_basic()
+                except FileNotFoundError:
+                    pass
+            else:
+                pass
+
+        return render_template(template_name,
+                               failures=failures,
+                               flag=random_flag,
+                               end=end,
+                               answer_correct=answer_correct,
+                               answer_failed=answer_failed,
+                               percentage_correct=percentage_correct,
                                percentage_failed=percentage_failed)
 
 
