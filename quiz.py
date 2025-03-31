@@ -174,8 +174,11 @@ class Flags(Quiz):
         self.flags_list = flags_list
 
     def get_random_flag(self):
-        flags_list = os.listdir("static/flags_high_res")
-        return random.choice(flags_list)
+        try:
+            flags_list = os.listdir("static/flags_high_res")
+            return random.choice(flags_list)
+        except FileNotFoundError as e:
+            return e
 
     def __repr__(self):
         return (
